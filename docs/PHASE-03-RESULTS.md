@@ -21,7 +21,7 @@ Changed files: Core collection/session contracts and optional diagnostics; Colle
 - [x] Separate system/demo history, error/busy/cancel behavior, 40 WPF render combinations and real executable launch/exit
 - [ ] Physical DPI 100/150/200% and complete keyboard audit / DPI 与完整键盘手测
 - [ ] Actual third-party software installation/uninstallation experiment / 真实第三方软件安装卸载实验
-- [ ] Remote Windows CI result / 远端 Windows CI
+- [x] Remote Windows CI / 远端 Windows CI
 
 ## Executed checks / 实际检查
 
@@ -39,7 +39,11 @@ Windows x64, .NET SDK 10.0.403, Release. The original restricted test invocation
 | Real read-only scan + initial persistence | PASS, 4 successful baselines, 0 changes; test duration about 0.55s on this machine |
 | UI render regression | PASS, 40 page/language/theme/mode combinations, using fake sources for privacy |
 | App startup and normal exit | PASS |
-| GitHub Windows CI | Pending PR run / 等待 PR 运行 |
+| GitHub Windows CI | PASS: [run 40304349428](https://github.com/Morris233/systemtrace/actions/runs/40304349428), commit `e717239e96472af1edefffa9fcfa3d607b6d5c80` |
+
+Remote Windows CI restored locked dependencies, built Release, passed all 47 tests, verified formatting and uploaded results using the official Node 24 actions. The recorded run validates the identified implementation commit; subsequent documentation updates are checked through [PR #2 checks](https://github.com/Morris233/systemtrace/pull/2/checks). This PR is based on the still-unmerged PHASE 02 branch, so review PR #1 first.
+
+远端 Windows CI 已通过锁定还原、构建、47 项测试、格式检查及结果上传。上表记录具体实现提交；后续文档提交状态见 PR 实时检查。第三阶段 PR 以尚未合并的第二阶段分支为基础，应先审阅 PR #1。
 
 ### Real read-only smoke result / 实机只读结果
 
