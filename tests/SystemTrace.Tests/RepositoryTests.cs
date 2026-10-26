@@ -185,6 +185,17 @@ public sealed class RepositoryTests
     }
 
     [Fact]
+    public async Task UnversionedForeignDatabaseIsRejectedAndPreserved()
+    {
+        using var store = new TestStore();
+        store.Execute("CREATE TABLE sqliteUserNotes(note TEXT); INSERT INTO sqliteUserNotes VALUES('preserve');");
+        await Assert.ThrowsAsync<InvalidOperationException>(() => store.Repository.CommitAsync(Run(0)));
+        Assert.Equal(0, store.Scalar("PRAGMA user_version"));
+        Assert.Equal(1, store.Scalar("SELECT COUNT(*) FROM sqliteUserNotes"));
+        Assert.Equal(0, store.Scalar("SELECT COUNT(*) FROM sqlite_master WHERE name='scan_runs'"));
+    }
+
+    [Fact]
     public async Task CancelledRunDoesNotCreateOrModifyHistory()
     {
         using var store = new TestStore();

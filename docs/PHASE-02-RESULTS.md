@@ -31,7 +31,7 @@ Windows x64, .NET SDK 10.0.403, Release. Local commands use the existing task-on
 | --- | --- |
 | `dotnet restore --locked-mode` (local feed) | PASS |
 | `dotnet build --configuration Release --no-restore` | PASS, 0 warnings / 0 errors |
-| `dotnet test --configuration Release --no-build --logger trx` | PASS, 33 passed / 0 failed / 0 skipped |
+| `dotnet test --configuration Release --no-build --logger trx` | PASS, 34 passed / 0 failed / 0 skipped |
 | `dotnet format --verify-no-changes --no-restore` | PASS |
 | WPF render combinations at 960×620 | PASS, 20 combinations after two actual demo commits |
 | Executable launch and normal close | PASS |

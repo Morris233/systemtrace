@@ -138,7 +138,7 @@ public sealed class SqliteScanRepository : IScanRepository
                 if (Convert.ToInt32(check.ExecuteScalar(), CultureInfo.InvariantCulture) == 0)
                 {
                     using var tables = Command(connection, migration,
-                        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'");
                     if (Convert.ToInt32(tables.ExecuteScalar(), CultureInfo.InvariantCulture) != 0)
                         throw new InvalidOperationException("Unrecognized unversioned database");
                     Execute(connection, migration, Schema);
