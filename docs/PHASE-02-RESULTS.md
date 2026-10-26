@@ -21,7 +21,7 @@ Changed files: Core inventory models/keys/diff engine/interfaces; Infrastructure
 - [x] Demo UI uses real repository; generated command handles busy/error/cancel / 界面接入实际演示库
 - [x] Simplified Chinese / English, light / dark, five-page render regression
 - [ ] Manual DPI 100/150/200%, complete keyboard audit / DPI 及完整键盘手测
-- [ ] Remote CI result / 远端 CI 结果
+- [x] Remote Windows CI / 远端 Windows CI
 
 ## Executed checks / 实际检查
 
@@ -36,7 +36,11 @@ Windows x64, .NET SDK 10.0.403, Release. Local commands use the existing task-on
 | WPF render combinations at 960×620 | PASS, 20 combinations after two actual demo commits |
 | Executable launch and normal close | PASS |
 | Resolved dependencies vs NuGet advisory feed | PASS, 26 resolved packages, 0 matches on 2026-10-26 |
-| GitHub Windows CI | Pending PR run / 等待 PR 运行 |
+| GitHub Windows CI | PASS: [run 40297770398](https://github.com/Morris233/systemtrace/actions/runs/40297770398), commit `aa2183394561e8fa67a7885fab535345f289c53d` |
+
+Remote Windows CI successfully restored locked dependencies, built Release, executed tests, verified formatting and uploaded test results. The recorded run validates the identified commit; subsequent copy/documentation changes are also checked through [PR #1 checks](https://github.com/Morris233/systemtrace/pull/1/checks).
+
+远端 Windows CI 已通过锁定还原、Release 构建、测试、格式检查及结果上传。上表明确记录验证提交；后续文案/文档更新的实时状态见 PR 检查。
 
 The dependency check found an older native SQLite advisory before delivery. The implementation now uses Microsoft.Data.Sqlite 10.0.14 with SQLitePCLRaw 2.1.13, whose official package versions and licenses were verified and locks regenerated. This is an advisory-feed check, not a complete security audit.
 

@@ -54,5 +54,5 @@
   <sys:String x:Key="SampleDriver">Sample driver</sys:String>
   <sys:String x:Key="Online">Online</sys:String>
   <sys:String x:Key="Offline">Offline</sys:String>
-  <sys:String x:Key="ItemCountFormat">{0} items</sys:String>
+  <sys:String x:Key="ItemCountFormat">Items: {0}</sys:String>
 </ResourceDictionary>
