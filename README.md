@@ -40,6 +40,6 @@ docs/                         # Requirements, design constraints and verificatio
 
 ## Document provenance
 
-`AGENTS.md`, `docs/PRODUCT.md`, and `docs/PHASES.md` were imported unchanged from the user's downloads. The original package ZIP, README and other referenced design documents were unavailable. The README and architecture, data-model, UI and test notes were added during initialization, are explicitly scoped to PHASE 01, and do not claim to recover the missing originals. The supplied PRD and phase constraints remain authoritative.
+`AGENTS.md`, `docs/PRODUCT.md`, and `docs/PHASES.md` were imported from the user's downloads. The product and phase documents remain unchanged; AGENTS.md subsequently received the user's explicit concise-UI rule. The original package ZIP, README and other referenced design documents were unavailable. The README and architecture, data-model, UI and test notes were added during initialization, are explicitly scoped to PHASE 01, and do not claim to recover the missing originals. The supplied PRD and phase constraints remain authoritative.
 
 See [verification](docs/PHASE-01-RESULTS.md), [third-party notices](docs/THIRD-PARTY.md), and [privacy](docs/PRIVACY.md). MIT licensed.

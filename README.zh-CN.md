@@ -27,6 +27,6 @@ dotnet run --project src/SystemTrace.App
 
 `src/` 包含 App、Core、Collectors、Infrastructure 四层；`tests/` 为 xUnit 测试；`docs/` 为设计与验收记录；`.github/workflows/ci.yml` 在 Windows 构建测试。
 
-从下载目录原样导入了 `AGENTS.md`、`docs/PRODUCT.md`、`docs/PHASES.md`。未取得原 ZIP、README 及其余设计原稿。README 和架构、模型、界面、测试补充说明由本次初始化新增，仅定义第一阶段所需边界，不声称恢复了缺失原稿。原 PRD 与阶段要求仍为依据。
+从下载目录导入了 `AGENTS.md`、`docs/PRODUCT.md`、`docs/PHASES.md`。产品及阶段文档保持原样；AGENTS.md 后续追加了用户明确要求的简洁界面准则。未取得原 ZIP、README 及其余设计原稿。README 和架构、模型、界面、测试补充说明由本次初始化新增，仅定义第一阶段所需边界，不声称恢复了缺失原稿。原 PRD 与阶段要求仍为依据。
 
 参见[验证记录](docs/PHASE-01-RESULTS.md)、[依赖许可](docs/THIRD-PARTY.md)及[隐私说明](docs/PRIVACY.md)。使用 MIT 许可证。

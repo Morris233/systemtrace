@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SystemTrace.App/SystemTrace.App.csproj" />
+    <Project Path="src/SystemTrace.Core/SystemTrace.Core.csproj" />
+    <Project Path="src/SystemTrace.Collectors/SystemTrace.Collectors.csproj" />
+    <Project Path="src/SystemTrace.Infrastructure/SystemTrace.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SystemTrace.Tests/SystemTrace.Tests.csproj" />
+  </Folder>
+</Solution>
