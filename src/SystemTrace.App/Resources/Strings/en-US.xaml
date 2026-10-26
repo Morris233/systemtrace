@@ -10,7 +10,7 @@
   <sys:String x:Key="ThemeToggle">Switch theme</sys:String>
   <sys:String x:Key="DemoNotice">DEMO · Sample data. No system information collected.</sys:String>
   <sys:String x:Key="OverviewTitle">Overview</sys:String>
-  <sys:String x:Key="ScopeTitle">Monitored categories</sys:String>
+  <sys:String x:Key="ScopeTitle">Total changes</sys:String>
   <sys:String x:Key="Software">Software</sys:String>
   <sys:String x:Key="Startup">Startup sources</sys:String>
   <sys:String x:Key="Drivers">Drivers</sys:String>
@@ -31,8 +31,8 @@
   <sys:String x:Key="SnapshotPlaceholder">No snapshot</sys:String>
   <sys:String x:Key="CompareUnavailable">Comparison is not available yet.</sys:String>
   <sys:String x:Key="TroubleshootTitle">Troubleshoot</sys:String>
-  <sys:String x:Key="TroubleshootEmpty">No history</sys:String>
-  <sys:String x:Key="TroubleshootBody">Create a baseline to review changes by time.</sys:String>
+  <sys:String x:Key="TroubleshootEmpty">Not available yet</sys:String>
+  <sys:String x:Key="TroubleshootBody">Demo records are listed under Changes.</sys:String>
   <sys:String x:Key="SettingsTitle">Settings</sys:String>
   <sys:String x:Key="SettingsSubtitle">Changes apply to this session.</sys:String>
   <sys:String x:Key="AppearanceTitle">Display</sys:String>
@@ -40,4 +40,19 @@
   <sys:String x:Key="ThemeDescription">Theme</sys:String>
   <sys:String x:Key="BackgroundTitle">Background monitoring</sys:String>
   <sys:String x:Key="BackgroundBody">Off · Not available yet</sys:String>
+  <sys:String x:Key="RunDemo">Run demo</sys:String>
+  <sys:String x:Key="RunDemoHint">First run creates a demo baseline.</sys:String>
+  <sys:String x:Key="BaselineReady">Baseline ready</sys:String>
+  <sys:String x:Key="LastDemo">Last demo:</sys:String>
+  <sys:String x:Key="StorageError">Could not load or save demo data. Try again.</sys:String>
+  <sys:String x:Key="NoChanges">No changes</sys:String>
+  <sys:String x:Key="ObservedWindow">Observed between</sys:String>
+  <sys:String x:Key="Added">Added</sys:String>
+  <sys:String x:Key="Removed">Removed</sys:String>
+  <sys:String x:Key="Modified">Modified</sys:String>
+  <sys:String x:Key="SampleStartup">Sample startup entry</sys:String>
+  <sys:String x:Key="SampleDriver">Sample driver</sys:String>
+  <sys:String x:Key="Online">Online</sys:String>
+  <sys:String x:Key="Offline">Offline</sys:String>
+  <sys:String x:Key="ItemCountFormat">{0} items</sys:String>
 </ResourceDictionary>

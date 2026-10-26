@@ -10,7 +10,7 @@
   <sys:String x:Key="ThemeToggle">切换主题</sys:String>
   <sys:String x:Key="DemoNotice">演示 / DEMO · 样例数据，未采集本机信息</sys:String>
   <sys:String x:Key="OverviewTitle">概览</sys:String>
-  <sys:String x:Key="ScopeTitle">监测类别</sys:String>
+  <sys:String x:Key="ScopeTitle">累计变化</sys:String>
   <sys:String x:Key="Software">软件</sys:String>
   <sys:String x:Key="Startup">启动来源</sys:String>
   <sys:String x:Key="Drivers">驱动</sys:String>
@@ -31,8 +31,8 @@
   <sys:String x:Key="SnapshotPlaceholder">暂无快照</sys:String>
   <sys:String x:Key="CompareUnavailable">快照比较尚未开放。</sys:String>
   <sys:String x:Key="TroubleshootTitle">回溯</sys:String>
-  <sys:String x:Key="TroubleshootEmpty">暂无历史记录</sys:String>
-  <sys:String x:Key="TroubleshootBody">建立基线后，可按时间查看变化。</sys:String>
+  <sys:String x:Key="TroubleshootEmpty">暂未开放</sys:String>
+  <sys:String x:Key="TroubleshootBody">可在“变化”页查看演示记录。</sys:String>
   <sys:String x:Key="SettingsTitle">设置</sys:String>
   <sys:String x:Key="SettingsSubtitle">仅对本次运行生效。</sys:String>
   <sys:String x:Key="AppearanceTitle">显示</sys:String>
@@ -40,4 +40,19 @@
   <sys:String x:Key="ThemeDescription">主题</sys:String>
   <sys:String x:Key="BackgroundTitle">后台监测</sys:String>
   <sys:String x:Key="BackgroundBody">已关闭 · 尚未开放</sys:String>
+  <sys:String x:Key="RunDemo">运行演示</sys:String>
+  <sys:String x:Key="RunDemoHint">首次运行建立演示基线。</sys:String>
+  <sys:String x:Key="BaselineReady">基线已建立</sys:String>
+  <sys:String x:Key="LastDemo">最近演示：</sys:String>
+  <sys:String x:Key="StorageError">演示数据读写失败，请重试。</sys:String>
+  <sys:String x:Key="NoChanges">暂无变化</sys:String>
+  <sys:String x:Key="ObservedWindow">观察区间</sys:String>
+  <sys:String x:Key="Added">新增</sys:String>
+  <sys:String x:Key="Removed">移除</sys:String>
+  <sys:String x:Key="Modified">修改</sys:String>
+  <sys:String x:Key="SampleStartup">示例启动项</sys:String>
+  <sys:String x:Key="SampleDriver">示例驱动</sys:String>
+  <sys:String x:Key="Online">在线</sys:String>
+  <sys:String x:Key="Offline">离线</sys:String>
+  <sys:String x:Key="ItemCountFormat">{0} 项</sys:String>
 </ResourceDictionary>

@@ -2,7 +2,17 @@
 
 Initialization supplement, not the missing original design. 本次初始化补充，非缺失原稿。
 
-## PHASE 01 contract
+## PHASE 02
+
+Core now owns immutable inventory contracts, stable-key builders, diff engine, repository/session interfaces. Infrastructure implements the SQLite v1 schema/migration and synthetic DemoSession. Each operation uses a short-lived, nonpooled connection; writes use immediate transactions, and read history uses one consistent transaction. Schema creation is its own atomic migration; a cancelled first data commit can leave an empty initialized schema but no inventory, change or baseline records. Cancellation is checked before data commit. Unknown future schemas and mismatched Demo/System stores fail without overwriting data.
+
+App composes a Demo-only repository at the local-user app-data path, loads existing history asynchronously, and runs synthetic steps only when the user chooses Run demo. Generated AsyncRelayCommand prevents UI reentry, supports cancellation, and reports recoverable I/O errors without replacing the last good view. Window close cancels pending work. SQLite's ADO async APIs are synchronous, so complete database operations run via Task.Run; no I/O blocks the UI thread. There are no Windows collectors, scheduler, tray registration or system writes.
+
+Core 提供模型、稳定键、差异及接口；Infrastructure 提供事务库和演示会话。每次操作独立连接，关闭后释放。读历史使用一致事务，写入使用立即事务；建库迁移本身原子执行。取消首次数据写入可能留下空 schema，但不会留下清单、事件或基线。未知版本或来源不符会拒绝。App 仅在用户运行演示时生成虚构扫描，后台线程处理数据库，错误可重试、关闭可取消；真实采集层仍未实现。
+
+References: [Microsoft SQLite async limitations](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/async), [transactions](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/transactions).
+
+## PHASE 01 historical contract
 
 - App targets `net10.0-windows`, WPF, x64, `asInvoker`. It composes services with Microsoft.Extensions.DependencyInjection and uses `ILogger<T>` without a file or network logging sink.
 - Core targets `net10.0`, contains immutable demo contracts and language selection policy, and has no WPF, Win32, SQLite or package references.

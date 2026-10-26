@@ -21,7 +21,22 @@ Open the built Windows application without elevation. Visit all five pages, chan
 
 以普通权限启动，切换五页面、双语及主题；检查键盘焦点、最小尺寸及三种 DPI；关闭后确认进程退出。检查无数据库、自启、后台扫描和遥测。自动渲染测试不能代替完整手工验收。
 
-## Future coverage
+## PHASE 02 automated acceptance / 第二阶段自动验收
+
+- Initial successful baseline has no events; same state and different enumeration order yield no changes.
+- Added/removed/modified evidence and UTC observation windows round-trip; missing/null/empty/whitespace differ.
+- Stable keys normalize Windows identity casing/separators, preserve source scope and avoid delimiter collision; Core stays platform independent.
+- Exactly four unique category outcomes, valid time intervals, duplicate key and unreadable-field validation.
+- Partial/Failed/Skipped preserve last successful category baseline, retain available evidence, and never cause false removals; recovery compares against the last success. Successful empty result may remove.
+- Reusing scan ID with identical canonical input is idempotent; different input is rejected; concurrent duplicate connections commit once.
+- Injected SQL failure after an earlier category write rolls back run, results, snapshots, changes and baseline movement.
+- Cancelled commit, backwards observation, origin mismatch and future schema fail without overwriting history; SQL-looking field/key values remain data.
+- Restart persistence, version-1 migration, no database creation on empty load, recoverable UI failure, command reentry/cancellation.
+- WPF runs two real synthetic commits before rendering all five pages × two themes × two languages; startup and close are exercised separately.
+
+初始基线、规范化、字段差异、混合采集状态、故障恢复、事务回滚、并发幂等、取消、来源隔离、迁移、重开读取及双语主题渲染均通过真实 SQLite 临时库测试；测试只清理自己的隔离目录。
+
+## Later-phase coverage / 后续阶段
 
 PHASE 02 requires initial baseline, add/remove/modify, canonical ordering, null values, duplicate scans, mixed category statuses, partial/failed baseline protection and transaction rollback tests. PHASE 03 adds isolated fake Windows sources and read-only integration checks. Later phases add privacy-safe export, opt-in scheduling/startup, recovery, performance and clean-machine packaging checks per PRODUCT.md. Recover or replace the missing full release test plan before PHASE 06.
 

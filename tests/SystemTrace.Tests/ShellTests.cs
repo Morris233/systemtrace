@@ -34,18 +34,16 @@ public sealed class ShellTests
     [Fact]
     public void DemoIsExplicitAndContainsOnlyFourSyntheticCategories()
     {
-        var provider = new DemoDataProvider();
-        var first = provider.GetOverview();
+        var first = DemoSession.CreateRun(0, DateTimeOffset.UtcNow);
         Assert.True(first.IsDemo);
-        Assert.Equal(new[] { "Software", "Startup", "Drivers", "Network" }, first.Categories.Select(x => x.ResourceKey));
-        Assert.Equal(first.Categories, provider.GetOverview().Categories);
-        Assert.All(first.Categories, category => Assert.True(category.ExampleCount >= 0));
+        Assert.Equal(Enum.GetValues<InventoryCategory>(), first.Results.Select(x => x.Category));
+        Assert.All(first.Results.SelectMany(result => result.Items), item => Assert.StartsWith("demo/", item.StableKey));
     }
 
     [Fact]
     public void CoreDoesNotReferencePlatformOrPersistenceAssemblies()
     {
-        var references = typeof(IDemoDataProvider).Assembly.GetReferencedAssemblies();
+        var references = typeof(IScanRepository).Assembly.GetReferencedAssemblies();
         Assert.DoesNotContain(references, a => a.Name?.Contains("Windows", StringComparison.OrdinalIgnoreCase) == true
             || a.Name?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true
             || a.Name?.StartsWith("Presentation", StringComparison.Ordinal) == true);
@@ -99,7 +97,14 @@ public sealed class ShellTests
                     Assert.False(string.IsNullOrWhiteSpace(chinese[key] as string));
                 });
                 Assert.Contains("DEMO", app.FindResource("DemoNotice").ToString());
-                var vm = CreateViewModel(appearance);
+                using var store = new TestStore();
+                var vm = new MainViewModel(new DemoSession(store.Repository), appearance, NullLogger<MainViewModel>.Instance);
+                Pump(vm.InitializeAsync());
+                Assert.Equal(0, vm.History.TotalRuns);
+                Pump(vm.RunDemoCommand.ExecuteAsync(null));
+                Assert.Empty(vm.History.Changes);
+                Pump(vm.RunDemoCommand.ExecuteAsync(null));
+                Assert.Equal(4, vm.History.Changes.Count);
                 var window = new MainWindow(vm) { Width = 960, Height = 620, ShowInTaskbar = false };
                 window.Show();
                 try
@@ -191,7 +196,25 @@ public sealed class ShellTests
     };
 
     private static MainViewModel CreateViewModel(IAppearanceService appearance) =>
-        new(new DemoDataProvider(), appearance, NullLogger<MainViewModel>.Instance);
+        new(new EmptySession(), appearance, NullLogger<MainViewModel>.Instance);
+
+    private static void Pump(Task task)
+    {
+        if (!task.IsCompleted)
+        {
+            var frame = new DispatcherFrame();
+            var dispatcher = Dispatcher.CurrentDispatcher;
+            _ = task.ContinueWith(_ => dispatcher.BeginInvoke(() => frame.Continue = false), TaskScheduler.Default);
+            Dispatcher.PushFrame(frame);
+        }
+        task.GetAwaiter().GetResult();
+    }
+
+    private sealed class EmptySession : IDemoSession
+    {
+        public Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default) => Task.FromResult(InventoryHistory.Empty);
+        public Task<InventoryHistory> RunAsync(CancellationToken cancellationToken = default) => Task.FromResult(InventoryHistory.Empty);
+    }
 
     private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
     {
@@ -236,6 +259,7 @@ public sealed class ShellTests
     {
         public string Language { get; private set; } = "en-US";
         public bool IsDark { get; private set; } = true;
+        public string Text(string key) => key;
         public void ToggleLanguage() => Language = Language == "en-US" ? "zh-CN" : "en-US";
         public void ToggleTheme() => IsDark = !IsDark;
     }

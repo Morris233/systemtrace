@@ -25,11 +25,12 @@
       </StackPanel></Border>
     </UniformGrid>
     <Border Style="{StaticResource Card}"><DockPanel>
-      <Button DockPanel.Dock="Right" Content="{DynamicResource ScanUnavailable}" IsEnabled="False" VerticalAlignment="Center" Margin="16,0,0,0" AutomationProperties.Name="{DynamicResource ScanUnavailable}" />
+      <Button DockPanel.Dock="Right" Content="{DynamicResource RunDemo}" Command="{Binding DataContext.RunDemoCommand, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" Margin="16,0,0,0" AutomationProperties.Name="{DynamicResource RunDemo}" />
       <StackPanel>
-        <TextBlock Text="{DynamicResource BaselineTitle}" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
-        <TextBlock Text="{DynamicResource BaselineBody}" Style="{StaticResource MutedText}" />
+        <TextBlock Text="{Binding StatusText}" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
+        <TextBlock Text="{Binding DetailText}" Style="{StaticResource MutedText}" />
       </StackPanel>
     </DockPanel></Border>
+    <TextBlock Text="{Binding DataContext.ErrorMessage, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="Wrap" Foreground="{DynamicResource DemoTextBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

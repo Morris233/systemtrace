@@ -7,6 +7,7 @@ public interface IAppearanceService
 {
     string Language { get; }
     bool IsDark { get; }
+    string Text(string key);
     void ToggleLanguage();
     void ToggleTheme();
 }
@@ -19,6 +20,8 @@ public sealed class AppearanceService : IAppearanceService
 
     public string Language { get; private set; }
     public bool IsDark { get; private set; } = true;
+
+    public string Text(string key) => resources[key] as string ?? key;
 
     public AppearanceService(ResourceDictionary resources, string? uiCultureName)
     {

@@ -13,6 +13,11 @@
     <Setter Property="FontSize" Value="17" /><Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Margin" Value="0,0,0,12" /><Setter Property="TextWrapping" Value="Wrap" />
   </Style>
+  <Style x:Key="EmptyRows" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+    <Setter Property="Visibility" Value="Collapsed" />
+    <Setter Property="Margin" Value="0,0,0,20" />
+    <Style.Triggers><DataTrigger Binding="{Binding Rows.Count}" Value="0"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+  </Style>
   <Style x:Key="Card" TargetType="Border">
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}" /><Setter Property="BorderThickness" Value="1" />
