@@ -12,11 +12,11 @@ public sealed class ViewModelTests
     public async Task IoFailureIsRecoverableAndDoesNotReplaceHistory()
     {
         var vm = Create(new FailingSession());
-        await vm.RunDemoCommand.ExecuteAsync(null);
+        await vm.ScanCommand.ExecuteAsync(null);
         Assert.Equal("StorageError", vm.ErrorMessage);
         Assert.Equal(0, vm.History.TotalRuns);
         Assert.False(vm.IsLoading);
-        Assert.True(vm.RunDemoCommand.CanExecute(null));
+        Assert.True(vm.ScanCommand.CanExecute(null));
     }
 
     [Fact]
@@ -24,16 +24,16 @@ public sealed class ViewModelTests
     {
         var session = new WaitingSession();
         var vm = Create(session);
-        var task = vm.RunDemoCommand.ExecuteAsync(null);
+        var task = vm.ScanCommand.ExecuteAsync(null);
         await session.Started.Task;
-        Assert.False(vm.RunDemoCommand.CanExecute(null));
-        vm.RunDemoCommand.Cancel();
+        Assert.False(vm.ScanCommand.CanExecute(null));
+        vm.ScanCommand.Cancel();
         await task;
         Assert.Null(vm.ErrorMessage);
         Assert.False(vm.IsLoading);
-        Assert.True(vm.RunDemoCommand.CanExecute(null));
+        Assert.True(vm.ScanCommand.CanExecute(null));
         vm.CancelPending();
-        Assert.False(vm.RunDemoCommand.CanExecute(null));
+        Assert.False(vm.ScanCommand.CanExecute(null));
     }
 
     private static MainViewModel Create(IDemoSession session) => new(session, new Appearance(), NullLogger<MainViewModel>.Instance);

@@ -5,6 +5,16 @@ namespace SystemTrace.Tests;
 
 public sealed class InventoryTests
 {
+    [Fact]
+    public void OlderCollectionJsonLoadsWithDefaultDiagnosticFields()
+    {
+        const string json = """
+            {"Category":0,"Status":0,"StartedAtUtc":"2026-10-26T00:00:00Z","CompletedAtUtc":"2026-10-26T00:00:00Z","Items":[],"ErrorCode":null}
+            """;
+        var result = System.Text.Json.JsonSerializer.Deserialize<CollectionResult>(json)!;
+        Assert.Empty(result.Warnings);
+        Assert.Equal(0, result.SkippedItemCount);
+    }
     private static readonly DateTimeOffset Time = DateTimeOffset.Parse("2026-10-26T00:00:00Z");
     internal static SnapshotItem Item(string key = "demo/item", string? value = "1", string field = "value") =>
         new(key, new Dictionary<string, FieldValue> { [field] = new(value) });

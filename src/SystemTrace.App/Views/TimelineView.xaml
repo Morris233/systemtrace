@@ -10,7 +10,7 @@
             <TextBlock DockPanel.Dock="Right" Text="{Binding KindText}" Foreground="{DynamicResource AccentBrush}" Margin="16,0,0,0" />
             <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap" />
           </DockPanel>
-          <TextBlock Text="{Binding ValueText}" Margin="0,0,0,8" />
+          <TextBlock Text="{Binding ValueText}" TextWrapping="Wrap" Margin="0,0,0,8" />
           <TextBlock Text="{Binding ObservationWindow}" Style="{StaticResource MutedText}" FontSize="12" />
         </StackPanel></Border>
       </DataTemplate></ItemsControl.ItemTemplate>

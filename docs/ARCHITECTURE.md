@@ -2,6 +2,16 @@
 
 Initialization supplement, not the missing original design. 本次初始化补充，非缺失原稿。
 
+## PHASE 03
+
+Core adds ISystemCollector and ISystemScanSession plus backwards-compatible collection warning/skipped-entry diagnostics. Collectors references only Core and framework Windows APIs. Four collector classes translate fakeable registry/file/device/network sources into canonical SnapshotItems; field errors become Partial, enumeration failures Failed, cancellation propagates. SystemScanSession runs all four independently and commits one scan through the existing atomic repository. Startup defaults to the system store but loads history only; no collection starts until Scan now. Demo and system mode use different stores and never share baselines.
+
+采集层只读，Core 不引用平台 API。四类状态独立，失败保留旧基线；新扫描完整收集各类别状态后原子提交。真实数据使用 system-v1.db，演示使用 demo-v1.db。切换模式只载入对应历史；关闭窗口取消未完成工作。所有数据库工作及 Windows 枚举在 UI 线程外执行。
+
+Software reads HKCU 64-bit view once (shared user Software view), and HKLM 32/64 views separately, retaining SystemComponent metadata. Startup reads Run/RunOnce in the same scopes and the current/common startup folders, without resolving or executing contents. Drivers use CM_Get_Device_ID_List with PRESENT only, CM_Locate_DevNode(NORMAL), and typed CM_Get_DevNode_Property calls; absent properties are known null, errors remain unreadable. NetworkInterface supplies adapter ID/name/description/type/operational status only. No additional package was introduced.
+
+References: [CM device enumeration](https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_device_id_listw), [device properties](https://learn.microsoft.com/en-us/windows/win32/api/cfgmgr32/nf-cfgmgr32-cm_get_devnode_propertyw), [driver version](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/devpkey-device-driverversion), [SDK property keys](https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/devpkey.h).
+
 ## PHASE 02
 
 Core now owns immutable inventory contracts, stable-key builders, diff engine, repository/session interfaces. Infrastructure implements the SQLite v1 schema/migration and synthetic DemoSession. Each operation uses a short-lived, nonpooled connection; writes use immediate transactions, and read history uses one consistent transaction. Schema creation is its own atomic migration; a cancelled first data commit can leave an empty initialized schema but no inventory, change or baseline records. Cancellation is checked before data commit. Unknown future schemas and mismatched Demo/System stores fail without overwriting data.

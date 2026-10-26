@@ -10,10 +10,10 @@ internal sealed class TestStore : IDisposable
     public string DatabasePath { get; }
     public SqliteScanRepository Repository { get; }
 
-    public TestStore()
+    public TestStore(bool isDemo = true)
     {
         DatabasePath = Path.Combine(directory, "demo.db");
-        Repository = new SqliteScanRepository(DatabasePath, isDemo: true);
+        Repository = new SqliteScanRepository(DatabasePath, isDemo);
     }
 
     public void Execute(string sql)
