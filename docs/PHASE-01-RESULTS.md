@@ -25,7 +25,7 @@ Environment: Windows x64, official .NET SDK 10.0.403, Release configuration. The
 | Requested execution level / 请求权限 | asInvoker, no elevation request |
 | Manual DPI 100/150/200% and full keyboard audit / DPI 与完整键盘验收 | NOT RUN |
 | Clean machine / 干净机器 | NOT RUN |
-| GitHub Actions / 远端 CI | Pending remote run / 等待远端运行 |
+| GitHub Actions / 远端 CI | NOT VERIFIED: the connector's workflow lookup exposes pull-request runs only; no remote PASS is claimed / 当前连接仅查询 PR 触发记录，未确认 push 任务结果 |
 
 Local NuGet HTTPS initially failed with Windows TLS `SEC_E_NO_CREDENTIALS`. Packages were downloaded from official NuGet endpoints using a certificate-verifying client, inspected for license metadata, then restored from a work-directory feed. The repository keeps normal nuget.org configuration; no certificate checks were disabled. Lock files capture the exact resolved package hashes. Local commands used an environment wrapper to keep SDK, cache and temporary writes inside the task workspace; the command table above shows equivalent standard SDK arguments.
 
@@ -55,3 +55,9 @@ Known limitations: only a demo shell; settings are in memory; no inventory, data
 Next phase proposal: PHASE 02 domain contracts, diff engine and SQLite, after reviewing this milestone; do not start it automatically.
 
 建议下一阶段：确认本阶段后执行 PHASE 02 领域契约、差异引擎及 SQLite；不自动跨阶段实施。
+
+## Repository verification / 仓库验证
+
+The private `Morris233/systemtrace` repository received a documentation initialization commit and the PHASE 01 implementation through GitHub's Git tree/commit/ref APIs. The submitted tree contains 56 source/configuration/documentation files, with no SDK, build output, local test logs, database or credentials. The solution and CI workflow were read back from the implementation commit; all XAML resource references resolve and PRODUCT.md / PHASES.md match the supplied originals byte for byte. This delivery uses the connected GitHub account; command-line Git authentication is unavailable locally.
+
+已通过连接的 GitHub 账号提交文档与 PHASE 01 代码，使用 Git tree/commit/ref API 更新 main。提交包含 56 份源码、配置及文档，没有 SDK、编译产物、本机测试日志、数据库或凭证。已从远端实现提交回读解决方案及 CI 工作流；所有 XAML 资源引用均可解析，PRODUCT.md 与 PHASES.md 和原文件逐字节一致。本机命令行 Git 暂无可用认证。
