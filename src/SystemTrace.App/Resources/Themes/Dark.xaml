@@ -8,7 +8,5 @@
   <SolidColorBrush x:Key="AccentBrush" Color="#B3A5FF" />
   <SolidColorBrush x:Key="AccentSoftBrush" Color="#312C4B" />
   <SolidColorBrush x:Key="HoverBrush" Color="#292E42" />
-  <SolidColorBrush x:Key="DemoBackgroundBrush" Color="#30281B" />
-  <SolidColorBrush x:Key="DemoBorderBrush" Color="#6B5530" />
-  <SolidColorBrush x:Key="DemoTextBrush" Color="#F5D38A" />
+  <SolidColorBrush x:Key="WarningTextBrush" Color="#F5D38A" />
 </ResourceDictionary>

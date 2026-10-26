@@ -136,8 +136,3 @@ public interface IScanRepository
     Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default);
 }
 
-public interface IDemoSession
-{
-    Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default);
-    Task<InventoryHistory> RunAsync(CancellationToken cancellationToken = default);
-}

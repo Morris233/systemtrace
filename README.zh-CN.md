@@ -1,32 +1,32 @@
 # SystemTrace
 
-在问题出现之前，知道系统发生过什么变化。
-
 [English](README.md) · [产品需求](docs/PRODUCT.md) · [开发阶段](docs/PHASES.md)
 
-面向 Windows 11 x64 的本地桌面项目，计划记录软件、已监测启动来源、PnP 驱动与网络适配器变化，默认使用普通用户权限。
+面向 Windows 11 x64 的本地桌面应用，记录软件、已监测启动来源、当前 PnP 驱动与网络适配器的变化，使用普通用户权限。
 
 ## 当前阶段
 
-PHASE 03：四类 Windows 只读采集器、独立状态、稳定键、字段差异和 SQLite 事务历史。程序默认“本机”模式，手动扫描建立类别基线，再次扫描检测变化；部分成功或失败时保留原基线。“演示”入口切换到独立虚构历史。保留五页面、中英双语及深浅主题。完整比较、搜索、详情界面、托盘、定时扫描和登录启动留待后续阶段。
+PHASE 04：扫描概览、可搜索与分页的变化列表、完整字段 before/after、成功快照比较、按观察区间回溯。点击“开始扫描”建立基线，之后再次扫描检测变化；部分成功或失败时保留上次成功基线。应用已移除演示入口和虚构数据，样例只存在于测试工程。
+
+搜索支持名称、字段名及前后值的字面子串与类别筛选。详情区分缺失、空值、空字符串和不可读。快照比较只读，不新增历史事件；回溯提供线索，不断言根因。托盘、调度、自启、导出与保留策略属于第五阶段。
 
 ## 构建与运行
 
-在 Windows 11 x64 安装微软官方 .NET 10 SDK，然后在仓库根目录运行：
+在 Windows 11 x64 安装微软官方 .NET 10 SDK，在仓库根目录运行：
 
 ```powershell
 dotnet restore --locked-mode
-dotnet build --no-restore
-dotnet test --no-build
+dotnet build --configuration Release --no-restore
+dotnet test --configuration Release --no-build
 dotnet run --project src/SystemTrace.App
 ```
 
-无需管理员权限，关闭窗口即退出。语言、主题和模式仅在本次运行生效。打开程序只载入已有历史，不自动扫描或创建新库。手动扫描保存到 `%LOCALAPPDATA%/SystemTrace/system-v1.db`，演示使用独立 demo-v1.db。不要提交这些数据库。启动命令仅作为本地证据保存，不会执行；网卡历史不含 IP、MAC、SSID 或密码。
+无需管理员权限，关闭窗口即退出。语言与主题仅本次运行生效。打开只载入已有历史，不自动扫描或创建新库。手动扫描保存到 `%LOCALAPPDATA%/SystemTrace/system-v1.db`，旧 schema 1 原子迁移到 schema 2；旧演示库不读取、不删除。不要提交数据库。启动命令只作为本地证据，不会执行；网卡历史不含 IP、MAC、SSID 或密码。
 
 ## 结构及文档来源
 
-`src/` 包含 App、Core、Collectors、Infrastructure 四层；`tests/` 为 xUnit 测试；`docs/` 为设计与验收记录；`.github/workflows/ci.yml` 在 Windows 构建测试。
+`src/` 包含 App、Core、Collectors、Infrastructure 四层；`tests/` 包含领域、隔离采集、查询迁移及 WPF 测试；`docs/` 包含设计与验收记录；Windows CI 执行锁定还原、Release 构建、测试和格式检查。
 
-从下载目录导入了 `AGENTS.md`、`docs/PRODUCT.md`、`docs/PHASES.md`。产品及阶段文档保持原样；AGENTS.md 后续追加了用户明确要求的简洁界面准则。未取得原 ZIP、README 及其余设计原稿。README 和架构、模型、界面、测试补充说明由本次初始化新增，仅定义第一阶段所需边界，不声称恢复了缺失原稿。原 PRD 与阶段要求仍为依据。
+从下载目录导入了 `AGENTS.md`、`docs/PRODUCT.md`、`docs/PHASES.md`。产品与阶段文档保持原样；AGENTS 追加了用户的简洁界面准则。未取得原 ZIP、README 及其余设计原稿，补充文档不声称恢复缺失内容。原 PRD 与阶段约束仍为依据。
 
-参见[第三阶段验证](docs/PHASE-03-RESULTS.md)、[第二阶段历史](docs/PHASE-02-RESULTS.md)、[依赖许可](docs/THIRD-PARTY.md)及[隐私说明](docs/PRIVACY.md)。使用 MIT 许可证。
+参见[第四阶段验证](docs/PHASE-04-RESULTS.md)、[第三阶段历史](docs/PHASE-03-RESULTS.md)、[依赖许可](docs/THIRD-PARTY.md)及[隐私说明](docs/PRIVACY.md)。MIT 许可证。

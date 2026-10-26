@@ -13,7 +13,7 @@ public sealed class RepositoryTests
 
     private static ScanRun CreateRun(int step, Guid? id, Dictionary<InventoryCategory, CollectionStatus> statuses)
     {
-        var demo = DemoSession.CreateRun(step, Time.AddMinutes(step));
+        var demo = SampleSession.CreateRun(step, Time.AddMinutes(step));
         return new ScanRun(id ?? demo.Id, demo.StartedAtUtc, demo.CompletedAtUtc, true,
             demo.Results.Select(r => new CollectionResult(r.Category, statuses.GetValueOrDefault(r.Category, r.Status),
                 r.StartedAtUtc, r.CompletedAtUtc,
@@ -33,7 +33,7 @@ public sealed class RepositoryTests
         Assert.Equal(1, history.TotalRuns);
         Assert.Equal(4, history.Baselines.Count);
         Assert.Empty(history.Changes);
-        Assert.Equal(1, store.Scalar("PRAGMA user_version"));
+        Assert.Equal(2, store.Scalar("PRAGMA user_version"));
         Assert.Equal(4, store.Scalar("SELECT COUNT(*) FROM collection_results"));
     }
 

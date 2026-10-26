@@ -1,40 +1,67 @@
-<UserControl x:Class="SystemTrace.App.Views.OverviewView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel>
-    <TextBlock Text="{DynamicResource OverviewTitle}" Style="{StaticResource PageTitle}" />
-    <TextBlock Text="{DynamicResource ScopeTitle}" Style="{StaticResource SectionTitle}" />
-    <UniformGrid Columns="2" Margin="-6,0,-6,24">
-      <Border Style="{StaticResource Card}" Padding="18" Margin="6"><StackPanel>
-        <TextBlock Text="{DynamicResource Software}" Style="{StaticResource MutedText}" />
-        <TextBlock Text="{Binding Overview.Categories[0].ExampleCount}" FontSize="30" Margin="0,4,0,0" />
-        <TextBlock Text="{Binding CountCaption}" Style="{StaticResource MutedText}" FontSize="12" />
-        <TextBlock Text="{Binding Results[0].StatusText}" ToolTip="{Binding Results[0].WarningText}" Foreground="{DynamicResource AccentBrush}" FontSize="12" Margin="0,8,0,0" />
-      </StackPanel></Border>
-      <Border Style="{StaticResource Card}" Padding="18" Margin="6"><StackPanel>
-        <TextBlock Text="{DynamicResource Startup}" Style="{StaticResource MutedText}" />
-        <TextBlock Text="{Binding Overview.Categories[1].ExampleCount}" FontSize="30" Margin="0,4,0,0" />
-        <TextBlock Text="{Binding CountCaption}" Style="{StaticResource MutedText}" FontSize="12" />
-        <TextBlock Text="{Binding Results[1].StatusText}" ToolTip="{Binding Results[1].WarningText}" Foreground="{DynamicResource AccentBrush}" FontSize="12" Margin="0,8,0,0" />
-      </StackPanel></Border>
-      <Border Style="{StaticResource Card}" Padding="18" Margin="6"><StackPanel>
-        <TextBlock Text="{DynamicResource Drivers}" Style="{StaticResource MutedText}" />
-        <TextBlock Text="{Binding Overview.Categories[2].ExampleCount}" FontSize="30" Margin="0,4,0,0" />
-        <TextBlock Text="{Binding CountCaption}" Style="{StaticResource MutedText}" FontSize="12" />
-        <TextBlock Text="{Binding Results[2].StatusText}" ToolTip="{Binding Results[2].WarningText}" Foreground="{DynamicResource AccentBrush}" FontSize="12" Margin="0,8,0,0" />
-      </StackPanel></Border>
-      <Border Style="{StaticResource Card}" Padding="18" Margin="6"><StackPanel>
-        <TextBlock Text="{DynamicResource Network}" Style="{StaticResource MutedText}" />
-        <TextBlock Text="{Binding Overview.Categories[3].ExampleCount}" FontSize="30" Margin="0,4,0,0" />
-        <TextBlock Text="{Binding CountCaption}" Style="{StaticResource MutedText}" FontSize="12" />
-        <TextBlock Text="{Binding Results[3].StatusText}" ToolTip="{Binding Results[3].WarningText}" Foreground="{DynamicResource AccentBrush}" FontSize="12" Margin="0,8,0,0" />
-      </StackPanel></Border>
-    </UniformGrid>
-    <Border Style="{StaticResource Card}"><DockPanel>
-      <Button DockPanel.Dock="Right" Content="{Binding DataContext.ScanButtonText, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding DataContext.ScanCommand, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" Margin="16,0,0,0" AutomationProperties.Name="{Binding DataContext.ScanButtonText, RelativeSource={RelativeSource AncestorType=Window}}" />
-      <StackPanel>
-        <TextBlock Text="{Binding StatusText}" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
-        <TextBlock Text="{Binding DetailText}" Style="{StaticResource MutedText}" />
-      </StackPanel>
-    </DockPanel></Border>
-    <TextBlock Text="{Binding DataContext.ErrorMessage, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="Wrap" Foreground="{DynamicResource DemoTextBrush}" Margin="0,8,0,0" />
-  </StackPanel>
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="SystemTrace.App.Views.OverviewView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="0,0,8,0">
+      <TextBlock Text="{DynamicResource Overview}" Style="{StaticResource PageTitle}"/>
+      <Grid Margin="0,0,0,24">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <TextBlock Text="{DynamicResource LastComplete}" Style="{StaticResource MutedText}" FontSize="12"/>
+          <TextBlock Text="{Binding LastCompleteText}" Margin="0,4,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="{DynamicResource LastAttempt}" Style="{StaticResource MutedText}" FontSize="12"/>
+          <TextBlock Text="{Binding LastAttemptText}" Margin="0,4,0,0"/>
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="{DynamicResource CurrentScan}" Style="{StaticResource SectionTitle}"/>
+      <ItemsControl ItemsSource="{Binding CategoryRows}" Margin="-5,0,-5,24">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="2"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Style="{StaticResource Card}" Padding="18" Margin="5" ToolTip="{Binding Hint}">
+              <StackPanel>
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right" Text="{Binding Status}" FontSize="12" Foreground="{DynamicResource AccentBrush}"/>
+                  <TextBlock Text="{Binding Label}" Style="{StaticResource MutedText}"/>
+                </DockPanel>
+                <TextBlock Text="{Binding ChangeCount}" FontSize="30" Margin="0,6,0,0"/>
+                <DockPanel>
+                  <TextBlock Text="{DynamicResource ChangeCount}" Style="{StaticResource MutedText}" FontSize="12"/>
+                  <TextBlock Text="{Binding ItemCount}" Style="{StaticResource MutedText}" FontSize="12" TextAlignment="Right"/>
+                </DockPanel>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Text="{DynamicResource RecentChanges}" Style="{StaticResource SectionTitle}"/>
+      <TextBlock Text="{DynamicResource NoChanges}" Style="{StaticResource EmptyRecent}"/>
+      <ItemsControl ItemsSource="{Binding RecentRows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button Command="{Binding DataContext.OpenRecentCommand,RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" HorizontalContentAlignment="Stretch" Margin="0,0,0,8" Padding="16,12">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                  <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding Window}" Style="{StaticResource MutedText}" FontSize="11" Margin="0,6,8,0"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding Kind}" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+              </Grid>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

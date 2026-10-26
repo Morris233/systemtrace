@@ -1,5 +1,14 @@
 # Privacy / 隐私
 
+## PHASE 04 current behavior / 第四阶段现状
+
+The app reads and stores only the system inventory described in PHASE 03 below. Production demo mode/generation has been removed; old demo-v1.db is ignored and never automatically deleted. Opening an existing system database may atomically migrate its schema from 1 to 2, even without a new scan; opening without an existing store still creates no database and starts no collector.
+
+Search text, clipped summaries and item counts are derived from evidence already in the same local database. Searching, detail loading, snapshot comparison and troubleshooting stay local. Snapshot comparison does not save new events; there is no export, automatic retention deletion, schedule, tray or login startup in this phase. Render fixtures are generated only inside tests. Schema migration and queries add no telemetry or network access.
+
+第四阶段查询索引和摘要只复制本机已有证据，不增加采集范围或上传。首次打开旧系统库会原子迁移，但不会自动扫描。旧演示库不再访问，不会自动清理。截图与源码包不包含真实清单、命令、路径、设备标识或数据库。以下较早阶段说明保留为开发历史，由本节更新当前行为。
+
+
 PHASE 03 reads the current user's and machine-wide uninstall registry entries, monitored Run/RunOnce values and startup-file metadata, present PnP driver properties and limited adapter metadata. A manual scan writes only `%LOCALAPPDATA%/SystemTrace/system-v1.db`. The app does not execute registry commands or shortcut targets, modify system settings, access other users' hives, install anything, or upload data. Demo data remains in its separate demo-v1.db. Opening the app loads existing history without scanning or creating a new database.
 
 启动命令、注册表源路径和设备实例稳定键可能包含个人信息，均只保存在本机系统库，不提交 Git，也不进入示例截图与源码包。软件卸载命令和安装目录不读取；网络不记录 IP、MAC、SSID 或密码。采集范围有限，不宣称覆盖全部软件/启动机制，也不将设备未检测到等同于卸载。

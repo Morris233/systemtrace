@@ -1,8 +1,8 @@
 using SystemTrace.Core;
 
-namespace SystemTrace.Infrastructure;
+namespace SystemTrace.Tests;
 
-public sealed class DemoSession(IScanRepository repository) : IDemoSession
+internal sealed class SampleSession(IScanRepository repository) : ISystemScanSession
 {
     public Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default) => repository.LoadAsync(cancellationToken);
 

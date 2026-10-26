@@ -1,10 +1,5 @@
 namespace SystemTrace.Core;
 
-// Phase 01 display contracts only. These are not collected system inventory.
-public sealed record DemoCategory(string ResourceKey, int ExampleCount);
-
-public sealed record DemoOverview(bool IsDemo, IReadOnlyList<DemoCategory> Categories);
-
 public static class LanguagePolicy
 {
     public static string Resolve(string? uiCultureName) =>

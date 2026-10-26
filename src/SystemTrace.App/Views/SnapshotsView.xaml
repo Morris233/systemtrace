@@ -1,16 +1,56 @@
-<UserControl x:Class="SystemTrace.App.Views.SnapshotsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel>
-    <TextBlock Text="{DynamicResource SnapshotsTitle}" Style="{StaticResource PageTitle}" />
-    <TextBlock Text="{DynamicResource SnapshotPlaceholder}" Style="{StaticResource EmptyRows}" />
-    <ItemsControl ItemsSource="{Binding Rows}" Margin="0,0,0,16">
-      <ItemsControl.ItemTemplate><DataTemplate>
-        <Border Style="{StaticResource Card}" Margin="0,0,0,10"><DockPanel>
-          <TextBlock DockPanel.Dock="Right" Text="{Binding ObservedAt}" Style="{StaticResource MutedText}" FontSize="12" />
-          <TextBlock DockPanel.Dock="Right" Text="{Binding ItemCount}" Foreground="{DynamicResource AccentBrush}" Margin="16,0,24,0" />
-          <TextBlock Text="{Binding CategoryText}" FontWeight="SemiBold" />
-        </DockPanel></Border>
-      </DataTemplate></ItemsControl.ItemTemplate>
-    </ItemsControl>
-    <TextBlock Text="{DynamicResource CompareUnavailable}" Style="{StaticResource MutedText}" />
-  </StackPanel>
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:views="clr-namespace:SystemTrace.App.Views" x:Class="SystemTrace.App.Views.SnapshotsView">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <TextBlock Text="{DynamicResource Snapshots}" Style="{StaticResource PageTitle}"/>
+    <StackPanel Grid.Row="1" Style="{StaticResource IdlePanel}">
+      <DockPanel Margin="0,0,0,12">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Content="{DynamicResource Previous}" Command="{Binding PreviousSnapshotsCommand}"/>
+          <TextBlock Text="{Binding SnapshotPageText}" VerticalAlignment="Center" Margin="10,0"/>
+          <Button Content="{DynamicResource Next}" Command="{Binding NextSnapshotsCommand}"/>
+        </StackPanel>
+        <ComboBox ItemsSource="{Binding SnapshotCategories}" SelectedItem="{Binding SnapshotCategory}" Width="170" HorizontalAlignment="Left" AutomationProperties.Name="{DynamicResource Category}"/>
+      </DockPanel>
+      <Grid Style="{StaticResource IdleGrid}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition Width="10"/>
+          <ColumnDefinition/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <TextBlock Text="{DynamicResource BeforeSnapshot}" Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,0,6"/>
+          <ComboBox ItemsSource="{Binding SnapshotChoices}" SelectedItem="{Binding BeforeSnapshot}" AutomationProperties.Name="{DynamicResource BeforeSnapshot}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+          <TextBlock Text="{DynamicResource AfterSnapshot}" Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,0,6"/>
+          <ComboBox ItemsSource="{Binding SnapshotChoices}" SelectedItem="{Binding AfterSnapshot}" AutomationProperties.Name="{DynamicResource AfterSnapshot}"/>
+        </StackPanel>
+        <Button Grid.Column="3" Content="{DynamicResource Compare}" Command="{Binding CompareCommand}" Margin="10,0,0,0" VerticalAlignment="Bottom"/>
+      </Grid>
+    </StackPanel>
+    <Grid Grid.Row="2" Margin="0,12,0,12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2*"/>
+        <ColumnDefinition Width="16"/>
+        <ColumnDefinition Width="3*"/>
+      </Grid.ColumnDefinitions>
+      <ListBox ItemsSource="{Binding ComparisonRows}" SelectedItem="{Binding SelectedComparisonRow,Mode=TwoWay}" Style="{StaticResource ChangeList}" AutomationProperties.Name="{DynamicResource ChangeRecords}"/>
+      <views:ChangeDetailView Grid.Column="2" DataContext="{Binding ComparisonDetail}"/>
+    </Grid>
+    <DockPanel Grid.Row="3">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="{DynamicResource Previous}" Command="{Binding PreviousComparisonCommand}"/>
+        <TextBlock Text="{Binding ComparisonPageText}" VerticalAlignment="Center" Margin="12,0"/>
+        <Button Content="{DynamicResource Next}" Command="{Binding NextComparisonCommand}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding ComparisonCountText}" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
+    </DockPanel>
+    <TextBlock Grid.Row="2" Text="{Binding ComparisonStateText}" Style="{StaticResource EmptyComparison}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,28,0,0" TextWrapping="Wrap" MaxWidth="240"/>
+  </Grid>
 </UserControl>
