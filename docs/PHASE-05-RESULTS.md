@@ -9,7 +9,7 @@ Changed files: Core Monitoring and MonitorSchedule; Infrastructure preferences, 
 Build: PASS, Release, 0 warnings / 0 errors.
 Tests: PASS, 73 passed / 0 failed / 0 skipped, including 4 real Windows integration cases. All registry mutations use random test-owned HKCU keys and are cleaned up.
 Manual verification: inspected representative bilingual/theme renders, including new settings and export controls. Automated WPF lifecycle verifies opted-in Close hides, Show restores, Pause toggles and Exit cancels work and closes. Real executable startup/early close exits normally. An early-close race found by the process test was fixed; no suppressed lifecycle exception remains.
-Remote Windows CI: pending this milestone push.
+Remote Windows CI: PASS, [run 40454152660](https://github.com/Morris233/systemtrace/actions/runs/40454152660), commit `78681ba5830388c0f60590b884f6fce4c273618d`, all 73 tests.
 
 ## Acceptance
 

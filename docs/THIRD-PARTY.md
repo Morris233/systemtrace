@@ -1,5 +1,10 @@
 # Dependencies / 第三方依赖
 
+PHASE 06 packages the self-contained Microsoft.NETCore.App and Microsoft.WindowsDesktop.App 10.0.14 runtimes with their included license/notices, plus production NuGet licenses and original nuspec attribution. Packages without an included license text use the corresponding Apache-2.0 or upstream .NET MIT text under licenses/. Build-Portable.ps1 fails if it cannot account for a package license. Windows Forms NotifyIcon adds no external package. The application icon is an original code/vector asset under the project MIT license.
+
+The release validation checked 28 resolved packages including the shipped runtime packs against NuGet's vulnerability feed using the official NuGet.Versioning range comparer, with no matching advisory. This remains a package-advisory check rather than a claim of exhaustive security certification.
+
+
 PHASE 03 adds no NuGet package. Windows collectors use framework registry/network APIs and the OS CfgMgr32 DLL. GitHub CI actions were updated to official Node 24 versions: checkout v7, setup-dotnet v6 and upload-artifact v7, removing the prior deprecated-action-runtime warning. 第三阶段无新增 NuGet 依赖；采集使用系统自带 API，CI 更新为已核实的官方 Node 24 Actions。
 
 Versions below were confirmed available through NuGet's official flat-container index before use. Lock files record the complete resolved graph; packages are open source, with no paid UI package.

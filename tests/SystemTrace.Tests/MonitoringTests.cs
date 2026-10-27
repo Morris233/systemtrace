@@ -176,7 +176,9 @@ public sealed class MonitoringTests
             {
                 ["display_name"] = new(" =HYPERLINK(\"bad\")\nline"),
                 ["command"] = new(@"C:\Users\PrivateUser\secret.cmd --token=secret"),
-                ["version"] = new(step.ToString())
+                ["version"] = new(step.ToString()),
+                ["driver_version"] = new("\0=HYPERLINK(\"private\")"),
+                ["driver_date"] = new(@"C:\Users\PrivateUser\secret")
             };
             return new(template.Id, template.StartedAtUtc, template.CompletedAtUtc, false,
                 template.Results.Select(result => new CollectionResult(result.Category, result.Status, result.StartedAtUtc,
@@ -188,6 +190,7 @@ public sealed class MonitoringTests
         var csv = Encoding.UTF8.GetString(raw.ToArray());
         Assert.Contains("\"' =HYPERLINK(\"\"bad\"\")\nline\"", csv);
         Assert.Equal((byte)0xef, raw.ToArray()[0]);
+        Assert.Contains("\"'\0=HYPERLINK", csv);
         using var redacted = new MemoryStream();
         await store.Repository.ExportAsync(redacted, ReportFormat.Csv, new());
         var safe = Encoding.UTF8.GetString(redacted.ToArray());

@@ -13,6 +13,7 @@ public sealed class TrayController : IDisposable
     private readonly MainViewModel model;
     private readonly IAppearanceService appearance;
     private readonly Forms.NotifyIcon icon;
+    private readonly System.Drawing.Icon trayIcon;
     private readonly Forms.ContextMenuStrip menu = new();
     private readonly Forms.ToolStripMenuItem open = new(), scan = new(), pause = new(), exit = new();
     private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
@@ -24,7 +25,9 @@ public sealed class TrayController : IDisposable
     {
         this.window = window; this.model = model; this.appearance = appearance;
         menu.Items.AddRange([open, scan, pause, new Forms.ToolStripSeparator(), exit]);
-        icon = new Forms.NotifyIcon { Text = "SystemTrace", Icon = System.Drawing.SystemIcons.Application, ContextMenuStrip = menu };
+        using var iconStream = typeof(TrayController).Assembly.GetManifestResourceStream("SystemTrace.Icon")!;
+        trayIcon = new System.Drawing.Icon(iconStream);
+        icon = new Forms.NotifyIcon { Text = "SystemTrace", Icon = trayIcon, ContextMenuStrip = menu };
         open.Click += (_, _) => Show();
         icon.DoubleClick += (_, _) => Show();
         scan.Click += async (_, _) => { if (model.ScanCommand.CanExecute(null)) await model.ScanCommand.ExecuteAsync(null); };
@@ -87,6 +90,6 @@ public sealed class TrayController : IDisposable
         if (disposed) return;
         disposed = true; timer.Stop(); timer.Tick -= OnTick;
         window.Closing -= OnClosing; model.PropertyChanged -= OnModelChanged; model.PreferencesApplied -= OnPreferences;
-        icon.Visible = false; icon.Dispose(); menu.Dispose();
+        icon.Visible = false; icon.Dispose(); trayIcon.Dispose(); menu.Dispose();
     }
 }

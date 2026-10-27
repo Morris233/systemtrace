@@ -1,0 +1,65 @@
+name: Portable release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portable-release
+  cancel-in-progress: false
+
+jobs:
+  package:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]'))
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore --locked-mode
+      - run: dotnet build --configuration Release --no-restore
+      - run: dotnet test --configuration Release --no-build --logger trx
+      - run: dotnet format --verify-no-changes --no-restore
+      - name: Build, license and smoke-test self-contained win-x64 package
+        shell: pwsh
+        run: ./scripts/Build-Portable.ps1 -Commit $env:GITHUB_SHA
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-assets
+          path: artifacts/release/*
+          if-no-files-found: error
+  publish:
+    needs: package
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Publish the verified version once
+        shell: pwsh
+        run: |
+          [xml]$properties = Get-Content Directory.Build.props -Raw
+          $version = [string]$properties.Project.PropertyGroup.Version
+          $tag = "v$version"
+          gh run download $env:GITHUB_RUN_ID --name release-assets --dir release-assets
+          if ($LASTEXITCODE -ne 0) { throw 'Release artifacts unavailable' }
+          $checksums = Get-Content release-assets/SHA256SUMS.txt
+          foreach ($line in $checksums) {
+            $expected, $name = $line -split '  ', 2
+            $actual = (Get-FileHash -LiteralPath (Join-Path release-assets $name) -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actual -ne $expected) { throw "Checksum mismatch: $name" }
+          }
+          gh release view $tag --json tagName 2>$null
+          if ($LASTEXITCODE -eq 0) { throw 'This version is already published; never replace release assets silently' }
+          gh release create $tag "release-assets/SystemTrace-$tag-win-x64.zip" release-assets/SHA256SUMS.txt release-assets/BUILD-INFO.json --target $env:GITHUB_SHA --title "SystemTrace $tag" --notes-file docs/RELEASE-NOTES.md
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release was not created' }

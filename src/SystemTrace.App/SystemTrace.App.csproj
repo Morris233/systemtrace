@@ -8,11 +8,14 @@
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/SystemTrace.ico</ApplicationIcon>
     <AssemblyName>SystemTrace.App</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
+    <EmbeddedResource Include="Assets/SystemTrace.ico" LogicalName="SystemTrace.Icon" />
+    <Resource Include="Assets/SystemTrace.ico" />
     <ProjectReference Include="../SystemTrace.Core/SystemTrace.Core.csproj" />
     <ProjectReference Include="../SystemTrace.Collectors/SystemTrace.Collectors.csproj" />
     <ProjectReference Include="../SystemTrace.Infrastructure/SystemTrace.Infrastructure.csproj" />

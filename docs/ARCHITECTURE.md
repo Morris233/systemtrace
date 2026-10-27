@@ -1,5 +1,16 @@
 # Architecture / 架构
 
+## PHASE 06 / Release hardening
+
+The repository now supplies a replacement T001–T026 matrix explicitly scoped to observed automated evidence and separate NOT RUN environmental experiments. Windows CI builds/tests/formats and verifies a self-contained win-x64 package. Normal and runtime-specific NuGet locks remain separate. Build-Portable gathers production/runtime licenses and attribution, records commit/SDK/runtime, validates payload and extracted-ZIP process/runtime isolation, then atomically writes ZIP/checksums. Release publishing is a gated main-only workflow with no silent version overwrite.
+
+SYSTEMTRACE_DATA_DIR is an explicit test-process isolation override; ordinary runs continue using LOCALAPPDATA/SystemTrace. It prevents smoke tests from reading/writing a user's actual history/settings. Single-instance activation is scoped by the resolved data directory. Public screenshots are compiled only into tests.
+
+Export hardening validates retained numeric/date/enum metadata and redacts nonstandard values rather than trusting a field name. CSV checks leading controls/Unicode-format characters as well as whitespace/formula prefixes. WPF accessible names now cover record buttons, lists, field values and identity; five-page traversal exercises them. Appearance persistence preserves existing validation errors while translating them. The first scan action directly says Create baseline.
+
+发布阶段补齐可复现打包、许可、校验、运行时隔离与 ZIP 解压运行检查。用户已明确授权公开发布；仓库公开状态单独验证，不从提交成功推断。未执行的物理环境实验持续如实记录。
+
+
 ## PHASE 05 / 第五阶段
 
 Monitoring is explicitly opt-in. AppPreferences persists language/theme, interval/retention and background/close-to-tray/sign-in flags with atomic JSON replacement. A per-user named instance lock and activation event avoid competing app instances. SystemScanSession owns a pipeline gate and reports collector progress; manual/tray/timer paths use the same generated scan command. MonitorSchedule is clock-driven, skips busy deadlines, and never queues a catch-up burst.

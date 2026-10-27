@@ -46,7 +46,7 @@
       <ItemsControl ItemsSource="{Binding RecentRows}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Button Command="{Binding DataContext.OpenRecentCommand,RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" HorizontalContentAlignment="Stretch" Margin="0,0,0,8" Padding="16,12">
+            <Button Command="{Binding DataContext.OpenRecentCommand,RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Window}" HorizontalContentAlignment="Stretch" Margin="0,0,0,8" Padding="16,12">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition/>

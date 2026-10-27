@@ -52,6 +52,7 @@
           <TextBlock Text="{DynamicResource RetainedBaselines}" Style="{StaticResource MutedText}" FontSize="12" Margin="0,12,0,0"/>
         </StackPanel>
       </Border>
+      <TextBlock Text="{Binding VersionText}" Style="{StaticResource MutedText}" FontSize="12" HorizontalAlignment="Right"/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

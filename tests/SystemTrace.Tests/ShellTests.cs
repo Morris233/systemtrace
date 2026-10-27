@@ -3,6 +3,8 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -86,7 +88,7 @@ public sealed class ShellTests
                 using var store = new TestStore(false);
                 Pump(store.Repository.CommitAsync(HistoryReaderTests.Run(0, 55)));
                 Pump(store.Repository.CommitAsync(HistoryReaderTests.Run(1, 55)));
-                var vm = new MainViewModel(new EmptySession(), store.Repository, appearance, NullLogger<MainViewModel>.Instance);
+                var vm = new MainViewModel(new EmptySession(), store.Repository, appearance, NullLogger<MainViewModel>.Instance, new TestApplicationServices());
                 Pump(vm.InitializeAsync());
                 Assert.Equal(2, vm.Dashboard.TotalRuns);
                 Assert.Equal(40, vm.TimelineRows.Count);
@@ -182,6 +184,42 @@ public sealed class ShellTests
                     var search = Descendants(window).OfType<TextBox>().First(t => t.Text == vm.SearchText);
                     Assert.True(search.Focus());
                     Assert.True(search.IsKeyboardFocused);
+                    foreach (var page in Enumerable.Range(0, 5))
+                    {
+                        vm.SelectedPageIndex = page; Layout(window);
+                        Assert.True(window.MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
+                        var visited = new HashSet<IInputElement>();
+                        for (var step = 0; step < 60; step++)
+                        {
+                            if (Keyboard.FocusedElement is { } focus)
+                            {
+                                visited.Add(focus);
+                                if (focus is Button or CheckBox or ComboBox or TextBox or DatePicker)
+                                {
+                                    var peer = UIElementAutomationPeer.CreatePeerForElement((UIElement)focus);
+                                    Assert.False(string.IsNullOrWhiteSpace(peer?.GetName()), "page=" + page + " " + focus.GetType().Name + " name=" + ((FrameworkElement)focus).Name + " content=" + (focus as ContentControl)?.Content + " has no accessible name");
+                                }
+                            }
+                            if (Keyboard.FocusedElement is UIElement current) current.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                        }
+                        Assert.True(visited.Count >= 4);
+                    }
+                    using var publicStore = new TestStore(false);
+                    Pump(publicStore.Repository.CommitAsync(PublicPreview.Run(false)));
+                    Pump(publicStore.Repository.CommitAsync(PublicPreview.Run(true)));
+                    var publicModel = new MainViewModel(new EmptySession(), publicStore.Repository, appearance,
+                        NullLogger<MainViewModel>.Instance, new TestApplicationServices());
+                    Pump(publicModel.InitializeAsync());
+                    if (appearance.Language != "en-US") Pump(publicModel.ToggleLanguageCommand.ExecuteAsync(null));
+                    window.DataContext = publicModel;
+                    publicModel.SelectedPageIndex = 0; Layout(window); SavePreview(window, "public-overview");
+                    publicModel.SelectedPageIndex = 1;
+                    publicModel.TimelineCategory = publicModel.FilterOptions.Single(option => option.Value == InventoryCategory.Software);
+                    Pump(publicModel.SearchCommand.ExecuteAsync(null));
+                    publicModel.SelectedTimelineRow = publicModel.TimelineRows[0];
+                    Pump(publicModel.OpenTimelineCommand.ExecutionTask!);
+                    Layout(window); SavePreview(window, "public-changes");
+
                     // Opted-in close hides only this test window; Show and Exit restore/finish it.
                     var trayApplication = new TestApplicationServices(new AppPreferences(BackgroundEnabled: true, MinimizeToTray: true));
                     var trayModel = new MainViewModel(new EmptySession(), new ViewModelTests.EmptyReader(), appearance,
@@ -231,7 +269,10 @@ public sealed class ShellTests
         var configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
         var executable = Path.Combine(root.FullName, "src", "SystemTrace.App", "bin", configuration,
             "net10.0-windows", "SystemTrace.App.exe");
-        using var process = Process.Start(new ProcessStartInfo(executable) { UseShellExecute = false, RedirectStandardError = true });
+        using var isolated = new TestStore(false);
+        var start = new ProcessStartInfo(executable) { UseShellExecute = false, RedirectStandardError = true };
+        start.Environment["SYSTEMTRACE_DATA_DIR"] = Path.GetDirectoryName(isolated.DatabasePath)!;
+        using var process = Process.Start(start);
         Assert.NotNull(process);
         try
         {

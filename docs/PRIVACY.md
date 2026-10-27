@@ -1,5 +1,8 @@
 # Privacy / 隐私
 
+PHASE 06 validates retained numeric/date/enum metadata; nonstandard free text is hidden even when stored in a nominal version/state field. Public screenshots are fictional fixtures only. Test processes explicitly isolate data through SYSTEMTRACE_DATA_DIR; normal users retain the standard LOCALAPPDATA directory. Release packages exclude logs/databases/PDBs and include only source documentation and dependency/runtime attribution.
+
+
 ## PHASE 05 / 第五阶段
 
 The opt-in sign-in toggle is the only production registry write: it manages the current user's SystemTrace Run value and removes it only on an exact command match. Background and close-to-tray are separate, visible opt-ins; defaults are off. Settings and metadata-only bounded diagnostics stay under the same local application directory. No network upload, telemetry, command execution or automatic repair exists.
