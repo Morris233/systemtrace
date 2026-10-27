@@ -182,6 +182,25 @@ public sealed class ShellTests
                     var search = Descendants(window).OfType<TextBox>().First(t => t.Text == vm.SearchText);
                     Assert.True(search.Focus());
                     Assert.True(search.IsKeyboardFocused);
+                    // Opted-in close hides only this test window; Show and Exit restore/finish it.
+                    var trayApplication = new TestApplicationServices(new AppPreferences(BackgroundEnabled: true, MinimizeToTray: true));
+                    var trayModel = new MainViewModel(new EmptySession(), new ViewModelTests.EmptyReader(), appearance,
+                        NullLogger<MainViewModel>.Instance, trayApplication);
+                    window.DataContext = trayModel;
+                    using (var tray = new TrayController(window, trayModel, appearance))
+                    {
+                        window.Close();
+                        Assert.False(window.IsVisible);
+                        Assert.True(trayModel.ScanCommand.CanExecute(null));
+                        tray.Show(); Layout(window);
+                        Assert.True(window.IsVisible);
+                        trayModel.PauseMonitoringCommand.Execute(null);
+                        Assert.True(trayModel.IsMonitoringPaused);
+                        tray.Exit();
+                        Assert.False(window.IsVisible);
+                        Assert.False(trayModel.ScanCommand.CanExecute(null));
+                    }
+
                 }
                 finally { window.Close(); }
                 listener.Flush();
@@ -212,7 +231,7 @@ public sealed class ShellTests
         var configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
         var executable = Path.Combine(root.FullName, "src", "SystemTrace.App", "bin", configuration,
             "net10.0-windows", "SystemTrace.App.exe");
-        using var process = Process.Start(new ProcessStartInfo(executable) { UseShellExecute = false });
+        using var process = Process.Start(new ProcessStartInfo(executable) { UseShellExecute = false, RedirectStandardError = true });
         Assert.NotNull(process);
         try
         {
@@ -227,7 +246,7 @@ public sealed class ShellTests
             Assert.Equal("SystemTrace", process.MainWindowTitle);
             Assert.True(process.CloseMainWindow(), "Main window did not accept close");
             Assert.True(process.WaitForExit(10000), "Application remained resident after closing");
-            Assert.Equal(0, process.ExitCode);
+            Assert.True(process.ExitCode == 0, process.StandardError.ReadToEnd());
         }
         finally
         {

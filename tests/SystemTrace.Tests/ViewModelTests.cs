@@ -117,6 +117,62 @@ public sealed class ViewModelTests
         Assert.Equal("null", detail.Fields[0].Name);
     }
 
+    [Fact]
+    public async Task PreferencesValidateAndExportUsesAppliedFilterWithPrivacyOn()
+    {
+        using var store = new TestStore(false);
+        var application = new TestApplicationServices();
+        var vm = new MainViewModel(new ReadSession(store.Repository), store.Repository, new Appearance(),
+            NullLogger<MainViewModel>.Instance, application);
+        await vm.InitializeAsync();
+        vm.IntervalMinutes = "1";
+        await vm.ApplyPreferencesCommand.ExecuteAsync(null);
+        Assert.Equal("InvalidPreferences", vm.ErrorMessage);
+        Assert.False(application.Preferences.BackgroundEnabled);
+        vm.IntervalMinutes = "5"; vm.BackgroundEnabled = true; vm.MinimizeToTray = true;
+        await vm.ApplyPreferencesCommand.ExecuteAsync(null);
+        Assert.True(application.Preferences.BackgroundEnabled);
+        Assert.True(application.Preferences.MinimizeToTray);
+        vm.PauseMonitoringCommand.Execute(null);
+        Assert.True(vm.IsMonitoringPaused);
+        vm.SearchText = "needle";
+        vm.TimelineCategory = vm.FilterOptions.Single(option => option.Value == InventoryCategory.Startup);
+        await vm.SearchCommand.ExecuteAsync(null);
+        vm.SearchText = "not yet applied";
+        await vm.ExportJsonCommand.ExecuteAsync(null);
+        Assert.Equal("needle", application.ExportedQuery!.Text);
+        Assert.Equal(InventoryCategory.Startup, application.ExportedQuery.Category);
+        Assert.True(application.ExportRedacted);
+        vm.BackgroundEnabled = false;
+        Assert.False(vm.MinimizeToTray);
+        await vm.ApplyPreferencesCommand.ExecuteAsync(null);
+        Assert.False(vm.IsMonitoringPaused);
+        Assert.False(vm.PauseMonitoringCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task CancelledDeleteConfirmationPreservesHistoryAndConfirmedDeleteResetsViews()
+    {
+        using var store = new TestStore(false);
+        await store.Repository.CommitAsync(HistoryReaderTests.Run(0));
+        await store.Repository.CommitAsync(HistoryReaderTests.Run(1));
+        var application = new TestApplicationServices(maintenance: store.Repository);
+        var vm = new MainViewModel(new ReadSession(store.Repository), store.Repository, new Appearance(),
+            NullLogger<MainViewModel>.Instance, application);
+        await vm.InitializeAsync();
+        await vm.OpenTimelineCommand.ExecuteAsync(vm.TimelineRows[0]);
+        await vm.ClearHistoryCommand.ExecuteAsync(null);
+        Assert.Equal(0, application.ClearCalls);
+        Assert.Equal(2, vm.Dashboard.TotalRuns);
+        application.AllowClear = true;
+        await vm.ClearHistoryCommand.ExecuteAsync(null);
+        Assert.Equal(1, application.ClearCalls);
+        Assert.Equal(0, vm.Dashboard.TotalRuns);
+        Assert.Empty(vm.TimelineRows);
+        Assert.Null(vm.TimelineDetail);
+        Assert.Empty(vm.SnapshotChoices);
+    }
+
     private sealed class ReadSession(IScanRepository repository) : ISystemScanSession
     {
         public Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default) => repository.LoadAsync(cancellationToken);

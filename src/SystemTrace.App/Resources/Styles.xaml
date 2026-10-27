@@ -319,4 +319,43 @@
       </DataTrigger>
     </Style.Triggers>
   </Style>
+  <Style TargetType="CheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style x:Key="BusyPanel" TargetType="StackPanel">
+    <Setter Property="Visibility" Value="Collapsed"/>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding IsBusy}" Value="True">
+        <Setter Property="Visibility" Value="Visible"/>
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="ScanningPanel" TargetType="DockPanel">
+    <Setter Property="Visibility" Value="Collapsed"/>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding IsScanning}" Value="True">
+        <Setter Property="Visibility" Value="Visible"/>
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="ScanProgressBar" TargetType="ProgressBar">
+    <Setter Property="IsIndeterminate" Value="True"/>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding IsScanning}" Value="True">
+        <Setter Property="IsIndeterminate" Value="False"/>
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="StatusText" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+    <Setter Property="Margin" Value="0,0,0,12"/>
+    <Style.Triggers>
+      <Trigger Property="Text" Value="{x:Null}">
+        <Setter Property="Visibility" Value="Collapsed"/>
+      </Trigger>
+      <Trigger Property="Text" Value="">
+        <Setter Property="Visibility" Value="Collapsed"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 </ResourceDictionary>

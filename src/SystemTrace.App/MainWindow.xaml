@@ -61,8 +61,17 @@
         </StackPanel>
         <TextBlock Text="{DynamicResource LocalNotice}" VerticalAlignment="Center" Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,12,0"/>
       </DockPanel>
-      <ProgressBar Grid.Row="1" IsIndeterminate="True" Height="3" Margin="0,0,0,12" Style="{StaticResource BusyProgress}" Foreground="{DynamicResource AccentBrush}"/>
-      <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" Style="{StaticResource ErrorText}"/>
+      <StackPanel Grid.Row="1" Style="{StaticResource BusyPanel}" Margin="0,0,0,12">
+        <ProgressBar Height="3" Maximum="4" Value="{Binding CompletedCollectors}" Foreground="{DynamicResource AccentBrush}" Style="{StaticResource ScanProgressBar}"/>
+        <DockPanel Margin="0,6,0,0" Style="{StaticResource ScanningPanel}">
+          <Button DockPanel.Dock="Right" Content="{DynamicResource Cancel}" Command="{Binding ScanCancelCommand}"/>
+          <TextBlock Text="{Binding ScanProgressText}" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
+        </DockPanel>
+      </StackPanel>
+      <StackPanel Grid.Row="2">
+        <TextBlock Text="{Binding ErrorMessage}" Style="{StaticResource ErrorText}"/>
+        <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource StatusText}"/>
+      </StackPanel>
       <ContentControl Grid.Row="3" Content="{Binding CurrentPage}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
     </Grid>
   </Grid>

@@ -6,7 +6,14 @@
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <TextBlock Text="{DynamicResource Timeline}" Style="{StaticResource PageTitle}"/>
+    <DockPanel Margin="0,0,0,20">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" ToolTip="{DynamicResource ExportHint}">
+        <CheckBox Content="{DynamicResource RedactExports}" IsChecked="{Binding RedactExports}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+        <Button Content="{DynamicResource ExportJson}" Command="{Binding ExportJsonCommand}" Margin="0,0,8,0"/>
+        <Button Content="{DynamicResource ExportCsv}" Command="{Binding ExportCsvCommand}"/>
+      </StackPanel>
+      <TextBlock Text="{DynamicResource Timeline}" FontSize="26" FontWeight="SemiBold"/>
+    </DockPanel>
     <Grid Grid.Row="1" Style="{StaticResource IdleGrid}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition/>

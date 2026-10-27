@@ -12,6 +12,7 @@ namespace SystemTrace.App.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly ISystemScanSession session;
+    private readonly IApplicationServices? application;
     private readonly IHistoryReader reader;
     private readonly IAppearanceService appearance;
     private readonly HistoryPresenter presenter;
@@ -75,9 +76,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private SnapshotOption? afterSnapshot;
     [ObservableProperty][NotifyPropertyChangedFor(nameof(ComparisonStateText))] private bool hasCompared;
 
-    public MainViewModel(ISystemScanSession session, IHistoryReader reader, IAppearanceService appearance, ILogger<MainViewModel> logger)
+    public MainViewModel(ISystemScanSession session, IHistoryReader reader, IAppearanceService appearance, ILogger<MainViewModel> logger, IApplicationServices? application = null)
     {
         this.session = session;
+        this.application = application;
         this.reader = reader;
         this.appearance = appearance;
         presenter = new HistoryPresenter(appearance);
@@ -85,6 +87,7 @@ public partial class MainViewModel : ObservableObject
         Pages = Array.AsReadOnly<object>([new OverviewPageViewModel(this), new TimelinePageViewModel(this),
             new SnapshotsPageViewModel(this), new TroubleshootPageViewModel(this), new SettingsPageViewModel(this)]);
         Relabel();
+        LoadPreferences();
     }
 
     public Task InitializeAsync() => WorkAsync(async token =>
@@ -104,7 +107,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var command in new IRelayCommand[] { ScanCommand, SearchCommand, PreviousTimelineCommand, NextTimelineCommand,
             SearchTroubleCommand, PreviousTroubleCommand, NextTroubleCommand, LoadSnapshotsCommand, PreviousSnapshotsCommand,
             NextSnapshotsCommand, CompareCommand, PreviousComparisonCommand, NextComparisonCommand, OpenTimelineCommand,
-            OpenTroubleCommand, OpenRecentCommand }) command.NotifyCanExecuteChanged();
+            OpenTroubleCommand, OpenRecentCommand, ApplyPreferencesCommand, PruneHistoryCommand, ClearHistoryCommand, ExportJsonCommand, ExportCsvCommand }) command.NotifyCanExecuteChanged();
     }
 
     private async Task WorkAsync(Func<CancellationToken, Task> action, CancellationToken token = default)
@@ -113,6 +116,7 @@ public partial class MainViewModel : ObservableObject
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, lifetime.Token);
         IsBusy = true;
         ShowError(null);
+        StatusMessage = null;
         try { await action(linked.Token); }
         catch (OperationCanceledException) when (linked.IsCancellationRequested) { }
         catch (Exception exception)
@@ -126,7 +130,19 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanWork), IncludeCancelCommand = true)]
     private Task ScanAsync(CancellationToken token) => WorkAsync(async ct =>
     {
-        await session.RunAsync(ct);
+        IsScanning = true; CompletedCollectors = 0; ScanningCategory = InventoryCategory.Software;
+        try
+        {
+            if (session is IProgressScanSession reporting)
+                await reporting.RunAsync(new Progress<ScanProgress>(progress =>
+                {
+                    if (!IsScanning) return;
+                    CompletedCollectors = progress.Completed; ScanningCategory = progress.Category;
+                }), ct);
+            else await session.RunAsync(ct);
+            if (application is not null) await application.PruneAsync(ct);
+        }
+        finally { IsScanning = false; }
         dashboard = await reader.GetDashboardAsync(ct);
         RelabelDashboard();
         await LoadTimelineAsync(ct);
@@ -340,6 +356,8 @@ public partial class MainViewModel : ObservableObject
             TroubleDetail = troubleEvidence is null ? null : presenter.Detail(troubleEvidence);
             ComparisonDetail = comparisonEvidence is null ? null : presenter.Detail(comparisonEvidence);
             if (errorKey is not null) ErrorMessage = presenter.Text(errorKey);
+            StatusMessage = null;
+            OnPropertyChanged(nameof(ScanProgressText));
             OnPropertyChanged(nameof(DisplayLanguage));
             NotifyPageLabels();
         }
@@ -350,6 +368,6 @@ public partial class MainViewModel : ObservableObject
         foreach (var name in new[] { nameof(TimelinePageText), nameof(TimelineCountText), nameof(TroublePageText), nameof(TroubleCountText),
             nameof(SnapshotPageText), nameof(ComparisonPageText), nameof(ComparisonCountText), nameof(ComparisonStateText) }) OnPropertyChanged(name);
     }
-    [RelayCommand] private void ToggleLanguage() { appearance.ToggleLanguage(); Relabel(); }
-    [RelayCommand] private void ToggleTheme() => appearance.ToggleTheme();
+    [RelayCommand(CanExecute = nameof(CanWork))] private async Task ToggleLanguageAsync() { appearance.ToggleLanguage(); Relabel(); await SaveAppearanceAsync(); }
+    [RelayCommand(CanExecute = nameof(CanWork))] private async Task ToggleThemeAsync() { appearance.ToggleTheme(); await SaveAppearanceAsync(); }
 }

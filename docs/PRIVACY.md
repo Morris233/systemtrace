@@ -1,5 +1,16 @@
 # Privacy / 隐私
 
+## PHASE 05 / 第五阶段
+
+The opt-in sign-in toggle is the only production registry write: it manages the current user's SystemTrace Run value and removes it only on an exact command match. Background and close-to-tray are separate, visible opt-ins; defaults are off. Settings and metadata-only bounded diagnostics stay under the same local application directory. No network upload, telemetry, command execution or automatic repair exists.
+
+JSON/CSV exports are user-initiated. Default redaction hides free-text names/descriptions, paths, commands and original stable identities; identities are pseudonymous hashes. Only approved factual fields (such as versions and state) remain, with user-path normalization. Raw exports require an explicit confirmation. CSV additionally neutralizes formula-leading cells, but redaction and formula guarding have different purposes.
+
+History retention defaults to 90 days (0 means keep all). Pruning happens after scans or a manual Remove expired action, retaining current category baselines/backing evidence and the latest attempt. Delete all history requires confirmation and resets baselines. SQLite secure_delete reduces recoverable freed content, but exports, backups and storage snapshots remain outside the app's deletion scope.
+
+只有用户启用登录启动时，生产代码才写自己的当前用户 Run 值。没有修改其他启动项、系统设置或网络配置。默认脱敏报告不含原始命令、路径或稳定键；原始导出由用户再次确认。自动清理保留必要基线，删除全部记录由用户明确确认。以下内容保留为较早阶段历史。
+
+
 ## PHASE 04 current behavior / 第四阶段现状
 
 The app reads and stores only the system inventory described in PHASE 03 below. Production demo mode/generation has been removed; old demo-v1.db is ignored and never automatically deleted. Opening an existing system database may atomically migrate its schema from 1 to 2, even without a new scan; opening without an existing store still creates no database and starts no collector.

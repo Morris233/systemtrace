@@ -2,24 +2,54 @@
   <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel>
       <TextBlock Text="{DynamicResource SettingsTitle}" Style="{StaticResource PageTitle}"/>
-      <TextBlock Text="{DynamicResource SettingsSubtitle}" Style="{StaticResource MutedText}" Margin="0,0,0,28"/>
       <Border Style="{StaticResource Card}" Margin="0,0,0,16">
-        <StackPanel>
-          <TextBlock Text="{DynamicResource AppearanceTitle}" Style="{StaticResource SectionTitle}"/>
-          <DockPanel Margin="0,8,0,18">
-            <Button DockPanel.Dock="Right" Content="{DynamicResource LanguageToggle}" Command="{Binding DataContext.ToggleLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}" Margin="18,0,0,0" AutomationProperties.Name="{DynamicResource LanguageToggle}"/>
-            <TextBlock Text="{DynamicResource LanguageDescription}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <StackPanel Style="{StaticResource IdlePanel}">
+          <DockPanel Margin="0,0,0,12">
+            <Button DockPanel.Dock="Right" Content="{DynamicResource LanguageToggle}" Command="{Binding ToggleLanguageCommand}"/>
+            <TextBlock Text="{DynamicResource LanguageDescription}" VerticalAlignment="Center"/>
           </DockPanel>
           <DockPanel>
-            <Button DockPanel.Dock="Right" Content="{DynamicResource ThemeToggle}" Command="{Binding DataContext.ToggleThemeCommand, RelativeSource={RelativeSource AncestorType=Window}}" Margin="18,0,0,0" AutomationProperties.Name="{DynamicResource ThemeToggle}"/>
-            <TextBlock Text="{DynamicResource ThemeDescription}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <Button DockPanel.Dock="Right" Content="{DynamicResource ThemeToggle}" Command="{Binding ToggleThemeCommand}"/>
+            <TextBlock Text="{DynamicResource ThemeDescription}" VerticalAlignment="Center"/>
+          </DockPanel>
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+        <StackPanel Style="{StaticResource IdlePanel}" IsEnabled="{Binding CanConfigure}">
+          <TextBlock Text="{DynamicResource BackgroundTitle}" Style="{StaticResource SectionTitle}"/>
+          <CheckBox Content="{DynamicResource BackgroundEnabled}" IsChecked="{Binding BackgroundEnabled}" Margin="0,4,0,12"/>
+          <CheckBox Content="{DynamicResource MinimizeToTray}" IsChecked="{Binding MinimizeToTray}" IsEnabled="{Binding BackgroundEnabled}" Margin="0,0,0,12"/>
+          <CheckBox Content="{DynamicResource StartAtLogin}" IsChecked="{Binding StartAtLogin}" ToolTip="{DynamicResource LoginHint}" Margin="0,0,0,16"/>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition/>
+              <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{DynamicResource IntervalMinutes}" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" Text="{Binding IntervalMinutes,UpdateSourceTrigger=PropertyChanged}" MaxLength="4" AutomationProperties.Name="{DynamicResource IntervalMinutes}"/>
+          </Grid>
+          <Grid Margin="0,12,0,16">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition/>
+              <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{DynamicResource RetentionDays}" VerticalAlignment="Center" ToolTip="{DynamicResource RetentionHint}"/>
+            <TextBox Grid.Column="1" Text="{Binding RetentionDays,UpdateSourceTrigger=PropertyChanged}" MaxLength="4" AutomationProperties.Name="{DynamicResource RetentionDays}"/>
+          </Grid>
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Content="{DynamicResource Save}" Command="{Binding ApplyPreferencesCommand}"/>
+            <TextBlock Text="{DynamicResource SettingsSubtitle}" Style="{StaticResource MutedText}" FontSize="12" VerticalAlignment="Center"/>
           </DockPanel>
         </StackPanel>
       </Border>
       <Border Style="{StaticResource Card}" Margin="0,0,0,16">
         <StackPanel>
-          <TextBlock Text="{DynamicResource BackgroundTitle}" Style="{StaticResource SectionTitle}"/>
-          <TextBlock Text="{DynamicResource BackgroundBody}" Style="{StaticResource MutedText}"/>
+          <TextBlock Text="{DynamicResource History}" Style="{StaticResource SectionTitle}"/>
+          <StackPanel Orientation="Horizontal">
+            <Button Content="{DynamicResource PruneHistory}" Command="{Binding PruneHistoryCommand}" Margin="0,0,10,0"/>
+            <Button Content="{DynamicResource ClearHistory}" Command="{Binding ClearHistoryCommand}"/>
+          </StackPanel>
+          <TextBlock Text="{DynamicResource RetainedBaselines}" Style="{StaticResource MutedText}" FontSize="12" Margin="0,12,0,0"/>
         </StackPanel>
       </Border>
     </StackPanel>
