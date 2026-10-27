@@ -22,7 +22,7 @@ Changed files: Core HistoryQueries, LanguagePolicy and cancellable DiffEngine; I
 - [ ] Physical 100/150/200% Windows DPI transitions / mixed-DPI monitors / 实机 DPI 切换
 - [ ] Full manual keyboard traversal / 完整键盘手工遍历
 - [ ] Actual third-party software installation/uninstallation / 真实第三方软件安装卸载
-- [ ] Remote Windows CI / 远端 Windows CI (pending push)
+- [x] Remote Windows CI / 远端 Windows CI
 
 ## Executed checks / 实际检查
 
@@ -43,7 +43,7 @@ Windows x64, .NET SDK 10.0.403, Release. Full integration tests ran in the norma
 | Additional normal-size and empty-history renders | PASS, 9 |
 | Actual executable startup / window close / process exit | PASS |
 | Real Windows integration | PASS, 3 cases |
-| GitHub Windows CI | PENDING |
+| GitHub Windows CI | PASS: [run 40332079857](https://github.com/Morris233/systemtrace/actions/runs/40332079857), implementation commit `79054ace1317d25d1c668b36aa7e6403bf6a30d1` |
 
 The full suite completed in about 6 seconds on this machine. Performance fixtures validate bounded result sizes and operation outside the UI thread; this is not a million-record latency benchmark. Queries use literal normalized substring matching, so a large text search can scan rows. Snapshot comparison materializes two inventories and their diff on a worker; UI retains one result page.
 
@@ -64,6 +64,6 @@ Manual verification: visually inspected representative minimum/normal-size overv
 
 Known limitations: physical DPI acceptance remains open; substring search is not culture-specific linguistic search; translated UI labels are not search aliases, so use the category filter; rejected ambiguous daylight-saving input needs a different unambiguous local time. Existing category coverage limits from PHASE 03 remain. Partial freezes the entire category baseline. Theme/language are session-only. No background monitoring or export is shipped.
 
-GitHub delivery: draft PHASE 04 PR will be stacked on codex/phase-03 while earlier PRs remain unmerged. Review earlier phases first; this task does not authorize implicit merges. CI links below will identify the tested implementation commit, and latest PR checks cover later documentation updates.
+GitHub delivery: [draft PR #3](https://github.com/Morris233/systemtrace/pull/3) is stacked on codex/phase-03 while earlier PRs remain unmerged. Review earlier phases first; this task does not authorize implicit merges. The identified implementation commit passed locked restore, Release build, all 56 tests, formatting and result upload on the remote Windows runner, with zero check annotations. [Latest PR checks](https://github.com/Morris233/systemtrace/pull/3/checks) cover later documentation updates.
 
 Next phase proposal: PHASE 05 opt-in tray, scheduling, login start, export and retention, after the user requests continuation. 第四阶段不自动跨入第五阶段。
