@@ -1,5 +1,16 @@
 # Architecture / 架构
 
+## PHASE 05 / 第五阶段
+
+Monitoring is explicitly opt-in. AppPreferences persists language/theme, interval/retention and background/close-to-tray/sign-in flags with atomic JSON replacement. A per-user named instance lock and activation event avoid competing app instances. SystemScanSession owns a pipeline gate and reports collector progress; manual/tray/timer paths use the same generated scan command. MonitorSchedule is clock-driven, skips busy deadlines, and never queues a catch-up burst.
+
+NotifyIcon/ContextMenuStrip come from the framework Windows Forms assembly; WPF remains the owner of DPI configuration and main window. WFO0003 is narrowly suppressed because Forms supplies only NotifyIcon; WPF retains its manifest PerMonitorV2 declaration. Tray disposal and close/initialization races are covered by real process/WPF tests. Sign-in start writes only an exact owned current-user value when explicitly enabled.
+
+Database maintenance uses immediate transactions and secure_delete, preserving baselines/latest attempt during retention. Export streams one evidence row at a time from a consistent read transaction, converts to a dedicated redacted DTO, and does not load all history. App file saving is atomic via a sibling temporary file. CSV uses quoting and formula guards. Diagnostics intentionally omit message text, stacks and collected evidence; only metadata is retained locally. No new NuGet package was added.
+
+后台、托盘常驻和登录启动默认关闭；手动、托盘、定时共用扫描锁。暂停与设置即时作用于调度，不积压扫描。原子设置、保留事务、默认脱敏导出均有隔离测试。WinForms 只用于托盘，主界面仍是 WPF。
+
+
 ## PHASE 04 current architecture / 第四阶段现状
 
 App now composes one system repository/session and an IHistoryReader. Production contains no demo generator, demo interface or mode switch. Synthetic SampleSession and fixture inventory exist only in the test assembly. Existing demo-v1.db is ignored and never deleted. The system filename remains system-v1.db for compatibility; its schema advances transactionally to version 2.

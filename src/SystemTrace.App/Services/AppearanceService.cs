@@ -23,11 +23,12 @@ public sealed class AppearanceService : IAppearanceService
 
     public string Text(string key) => resources[key] as string ?? key;
 
-    public AppearanceService(ResourceDictionary resources, string? uiCultureName)
+    public AppearanceService(ResourceDictionary resources, string? uiCultureName, bool isDark = true)
     {
         this.resources = resources;
         Language = LanguagePolicy.Resolve(uiCultureName);
-        Replace(ref theme, $"Themes/Dark.xaml");
+        IsDark = isDark;
+        Replace(ref theme, $"Themes/{(IsDark ? "Dark" : "Light")}.xaml");
         Replace(ref strings, $"Strings/{Language}.xaml");
     }
 

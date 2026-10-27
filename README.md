@@ -6,9 +6,9 @@ SystemTrace is a Windows 11 x64 desktop app for reviewing changes to software, m
 
 ## Current milestone
 
-PHASE 04: production dashboard, searchable/paged change history, complete before/after details, successful-snapshot comparison and observation-window troubleshooting. Click **Scan now** to establish baselines, then scan again to detect changes. Partial/failed categories retain their last successful baseline. Demo data and mode have been removed from the app; synthetic fixtures exist only in tests.
+PHASE 05: opt-in background monitoring, tray controls, sign-in start, progress/cancellation, persisted settings, privacy-first JSON/CSV export and retention are implemented alongside the dashboard/search/detail/comparison UI. Background, close-to-tray and sign-in start default off. Use Settings → Save to enable them. The scan interval defaults to 30 minutes and history to 90 days (0 keeps all).
 
-Search supports literal names, field names and before/after values plus a category filter. Details preserve null, empty, missing and unreadable values. Snapshot comparison is read-only. Troubleshooting matches observation intervals and provides clues, not a diagnosis. Tray monitoring, scheduling, login startup, exports and retention remain PHASE 05.
+Click **Scan now** to establish baselines. Failed/partial categories keep their last successful baseline. Exports cover the applied change search, all pages; personal details are hidden by default. Snapshot comparison is read-only and troubleshooting shows observation-window clues rather than a diagnosis. Release hardening is PHASE 06.
 
 ## Build and run
 
@@ -21,7 +21,7 @@ dotnet test --configuration Release --no-build
 dotnet run --project src/SystemTrace.App
 ```
 
-No administrator rights are requested. Closing the window exits. Language/theme choices are session-only. Opening reads existing history without scanning or creating a new database. A manual scan writes `%LOCALAPPDATA%/SystemTrace/system-v1.db`; existing schema 1 migrates atomically to schema 2. The old demo database is ignored, never deleted. Never commit inventory databases. Startup commands are stored as evidence only and are never executed. Network history excludes IP/MAC/SSID/passwords.
+No administrator rights are requested. Closing exits unless you explicitly enabled close-to-tray; Tray → Exit always exits. Language/theme choices are persisted. Opening reads existing history without scanning or creating a new database. A manual scan writes `%LOCALAPPDATA%/SystemTrace/system-v1.db`; existing schema 1 migrates atomically to schema 2. The old demo database is ignored, never deleted. Never commit inventory databases. Startup commands are stored as evidence only and are never executed. Network history excludes IP/MAC/SSID/passwords.
 
 ## Repository
 
@@ -42,4 +42,4 @@ docs/                         # Requirements, design and phase verification reco
 
 `AGENTS.md`, `docs/PRODUCT.md`, and `docs/PHASES.md` came from the user's downloads. PRODUCT and PHASES remain unchanged; AGENTS received the explicit concise-UI rule. The original ZIP, README and other design originals were unavailable. The README and design/test notes were added during development and do not claim to recover missing originals. The supplied PRD and phase constraints remain authoritative.
 
-See [PHASE 04 verification](docs/PHASE-04-RESULTS.md), [PHASE 03](docs/PHASE-03-RESULTS.md), [third-party notices](docs/THIRD-PARTY.md) and [privacy](docs/PRIVACY.md). MIT licensed.
+See [PHASE 05 verification](docs/PHASE-05-RESULTS.md), [PHASE 04 verification](docs/PHASE-04-RESULTS.md), [PHASE 03](docs/PHASE-03-RESULTS.md), [third-party notices](docs/THIRD-PARTY.md) and [privacy](docs/PRIVACY.md). MIT licensed.

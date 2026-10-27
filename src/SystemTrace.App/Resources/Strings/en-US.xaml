@@ -17,7 +17,7 @@
   <sys:String x:Key="SnapshotsTitle">Snapshots</sys:String>
   <sys:String x:Key="TroubleshootTitle">Troubleshoot</sys:String>
   <sys:String x:Key="SettingsTitle">Settings</sys:String>
-  <sys:String x:Key="SettingsSubtitle">Changes apply to this session.</sys:String>
+  <sys:String x:Key="SettingsSubtitle">Background scanning is off by default.</sys:String>
   <sys:String x:Key="AppearanceTitle">Display</sys:String>
   <sys:String x:Key="LanguageDescription">Language</sys:String>
   <sys:String x:Key="ThemeDescription">Theme</sys:String>
@@ -31,7 +31,7 @@
   <sys:String x:Key="Modified">Modified</sys:String>
   <sys:String x:Key="Online">Online</sys:String>
   <sys:String x:Key="Offline">Offline</sys:String>
-  <sys:String x:Key="LocalNotice">Local · Read only · Manual scan</sys:String>
+  <sys:String x:Key="LocalNotice">Local · Read only</sys:String>
   <sys:String x:Key="ScanNow">Scan now</sys:String>
   <sys:String x:Key="LastAttempt">Last attempt</sys:String>
   <sys:String x:Key="ChangeCount">changes</sys:String>
@@ -117,4 +117,33 @@
   <sys:String x:Key="Field_interface_type">Interface type</sys:String>
   <sys:String x:Key="Field_operational_status">Operational status</sys:String>
   <sys:String x:Key="Field_value">Value</sys:String>
+  <sys:String x:Key="BackgroundEnabled">Monitor in the background</sys:String>
+  <sys:String x:Key="MinimizeToTray">Close to tray</sys:String>
+  <sys:String x:Key="StartAtLogin">Start at sign-in</sys:String>
+  <sys:String x:Key="LoginHint">Current user only. Disable here or in Windows Startup settings.</sys:String>
+  <sys:String x:Key="IntervalMinutes">Scan interval (minutes)</sys:String>
+  <sys:String x:Key="RetentionDays">History (days, 0 = keep all)</sys:String>
+  <sys:String x:Key="RetentionHint">7–3650 days, or 0 to keep all.</sys:String>
+  <sys:String x:Key="Save">Save</sys:String>
+  <sys:String x:Key="Saved">Saved</sys:String>
+  <sys:String x:Key="Exported">Report saved</sys:String>
+  <sys:String x:Key="History">History</sys:String>
+  <sys:String x:Key="PruneHistory">Remove expired</sys:String>
+  <sys:String x:Key="ClearHistory">Delete all history</sys:String>
+  <sys:String x:Key="ClearConfirmation">Delete all scan history? The next successful scan creates new baselines.</sys:String>
+  <sys:String x:Key="RawExportConfirmation">This report will include raw commands, source paths and identifiers. Save without privacy filtering?</sys:String>
+  <sys:String x:Key="RetainedBaselines">Retention keeps current baselines and the latest attempt.</sys:String>
+  <sys:String x:Key="RedactExports">Hide personal details</sys:String>
+  <sys:String x:Key="ExportJson">JSON</sys:String>
+  <sys:String x:Key="ExportCsv">CSV</sys:String>
+  <sys:String x:Key="ExportHint">Export the current search, including all pages.</sys:String>
+  <sys:String x:Key="InvalidPreferences">Use 5–1440 minutes and 7–3650 days (or 0 to keep all).</sys:String>
+  <sys:String x:Key="PreferencesError">Settings could not be saved. Check permissions and the sign-in entry.</sys:String>
+  <sys:String x:Key="SettingsUnreadable">Settings could not be read. Background monitoring is off. Save settings to repair.</sys:String>
+  <sys:String x:Key="Saving">Saving</sys:String>
+  <sys:String x:Key="Cancel">Cancel</sys:String>
+  <sys:String x:Key="Open">Open</sys:String>
+  <sys:String x:Key="Exit">Exit</sys:String>
+  <sys:String x:Key="PauseMonitoring">Pause monitoring</sys:String>
+  <sys:String x:Key="ResumeMonitoring">Resume monitoring</sys:String>
 </ResourceDictionary>
