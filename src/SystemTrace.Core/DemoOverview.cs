@@ -5,11 +5,6 @@ public sealed record DemoCategory(string ResourceKey, int ExampleCount);
 
 public sealed record DemoOverview(bool IsDemo, IReadOnlyList<DemoCategory> Categories);
 
-public interface IDemoDataProvider
-{
-    DemoOverview GetOverview();
-}
-
 public static class LanguagePolicy
 {
     public static string Resolve(string? uiCultureName) =>

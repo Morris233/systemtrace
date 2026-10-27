@@ -7,8 +7,10 @@ Initialization supplement, not the missing original design. 本次初始化补�
 - Dark navy and light ivory themes, violet accent, 8-pixel spacing rhythm, 960×620 DIP minimum, scrollable content, wrapping copy. Use system fonts Segoe UI / Microsoft YaHei UI fallback.
 - Text, accessible names and placeholders use matching English / Simplified Chinese dictionary keys. Default follows OS UI language: any `zh` maps to Simplified Chinese, everything else to English. User can switch live.
 - Keyboard navigation follows logical reading order. Buttons retain visible focus. Meaning never depends only on color.
-- Language/theme actions are functional. Scan/export/startup/tray actions are unavailable, with explanatory text; no disabled control implies a completed scan.
+- Language/theme and Run demo actions are functional. First demo creates a baseline with zero changes; later steps update overview, evidence rows and baseline list from the demo database. Real scan/export/startup/tray actions remain unavailable. Comparison and time-window search remain later-phase features.
 - Synthetic entries remain visibly Demo. No real machine identifier or scan time appears.
+
+PHASE 02 displays UTC-backed observation windows in local time, at second resolution. These are times when synthetic examples were processed, never claimed occurrence times of a real system change. 页面仅显示必要的演示状态与观察区间；显示精度为秒，不把处理时刻声称为真实变化的发生时刻。
 
 五页面统一侧栏、功能标题与必要状态。用户要求简洁少字：不使用口号、装饰性主题标题、营销句或重复解释；风格由留白、排版、配色与一致控件体现。文字只用于识别功能、说明状态、支持操作。变化详情留待第四阶段；演示标识始终可见。中英文与深浅主题实时切换，内容可滚动，长文案换行。所有文案与无障碍名称来自双语资源。未开放的操作须明确状态。
 

@@ -10,4 +10,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
     }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        ((MainViewModel)DataContext).CancelPending();
+        base.OnClosed(e);
+    }
 }
