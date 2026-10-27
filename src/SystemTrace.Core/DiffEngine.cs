@@ -6,7 +6,7 @@ namespace SystemTrace.Core;
 
 public sealed class DiffEngine
 {
-    public IReadOnlyList<Change> Compare(Snapshot? previous, Snapshot current)
+    public IReadOnlyList<Change> Compare(Snapshot? previous, Snapshot current, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(current);
         if (previous is null) return Array.Empty<Change>();
@@ -17,6 +17,7 @@ public sealed class DiffEngine
         var changes = new List<Change>();
         foreach (var key in before.Keys.Union(after.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             before.TryGetValue(key, out var oldItem);
             after.TryGetValue(key, out var newItem);
             var names = (oldItem?.Fields.Keys ?? []).Union(newItem?.Fields.Keys ?? [], StringComparer.Ordinal).Order(StringComparer.Ordinal);

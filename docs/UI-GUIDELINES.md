@@ -1,23 +1,22 @@
 # UI guidelines / 界面规范
 
-Initialization supplement, not the missing original design. 本次初始化补充，非缺失原稿。
+The user's rule is authoritative: few words, direct functional labels, clear reading order. No slogans, decorative theme headlines, promotional prose or duplicate explanations. Style comes from spacing, typography, color and consistent controls.
 
-PHASE 03: default is System mode, with a short Local / Read only / Manual scan notice and a Scan now action. A separate Demo mode remains explicitly marked, with isolated history. Four category cards show last attempt status; scope/permission warnings and skipped counts appear on hover rather than as extra paragraphs. Observation windows and field summaries use actual persisted evidence. A missing PnP device is labeled Not detected this scan. Search, full details and snapshot comparison remain PHASE 04.
+用户准则：简洁少字、易扫读、操作有逻辑。页面用功能名；不用口号、主题类文案、营销句或重复说明。仅保留功能标签、状态、操作提示。排版、留白、配色与一致控件体现风格。
 
-第三阶段默认本机模式，保留独立演示入口。主操作仅“开始扫描”，类别卡显示状态，范围与权限说明放入悬停提示。设备消失不显示“已卸载”。继续禁止口号、装饰性标题和重复解释。
+## PHASE 04
 
-- Five top-level pages: Overview, Timeline, Snapshots, Troubleshoot, Settings. Change details will be a secondary surface in PHASE 04.
-- Persistent sidebar, direct functional page titles, one concise DEMO notice, quiet category cards and clear placeholder states. No slogans, decorative prose, promotional headings or repeated explanations. Style comes from spacing, typography, color and consistent controls. Keep only text that helps a user identify a function, understand its state or act.
-- Dark navy and light ivory themes, violet accent, 8-pixel spacing rhythm, 960×620 DIP minimum, scrollable content, wrapping copy. Use system fonts Segoe UI / Microsoft YaHei UI fallback.
-- Text, accessible names and placeholders use matching English / Simplified Chinese dictionary keys. Default follows OS UI language: any `zh` maps to Simplified Chinese, everything else to English. User can switch live.
-- Keyboard navigation follows logical reading order. Buttons retain visible focus. Meaning never depends only on color.
-- Language/theme and Run demo actions are functional. First demo creates a baseline with zero changes; later steps update overview, evidence rows and baseline list from the demo database. Real scan/export/startup/tray actions remain unavailable. Comparison and time-window search remain later-phase features.
-- Synthetic entries remain visibly Demo. No real machine identifier or scan time appears.
+- Five persistent pages: Overview / Changes / Snapshots / Troubleshoot / Settings. The global header has a short factual local/read-only/manual notice and language, theme and scan actions. No Demo entry or synthetic production data.
+- Overview distinguishes Last complete scan and Last attempt, four category cards, latest scan counts and status, retained baseline counts and recent 8 changes. Unsuccessful counts are “—”, not zero. Coverage/permission details remain in tooltips.
+- Changes: literal search, category, paged list and full detail. Search or Enter applies the filters. Search resets to page one. Detail clears when the query/page changes.
+- Detail: direct title/category/kind, observation interval, changed fields first, all before/after fields, and collapsible source identity. Read-only text fields allow copy and wrapping; long values scroll within a bounded field. Missing/null/empty/unreadable are explicit; error codes are tooltips. Raw collected values and unknown field identifiers remain exact evidence rather than being translated.
+- Snapshots: category, paged successful-snapshot catalogue, earlier/later selections, Compare and paged results. Selected headers stay available across catalogue pages; the list stays bounded (40 plus two pinned items). Invalid reversed/same/category-mismatched pairs disable Compare.
+- Troubleshoot: local issue date/time, 1/6/24-hour or 7-day lookback, category/text and Search. Concise caution explains observation-window clues without asserting cause. It uses the same paged list/detail.
+- Settings: session-only language/theme; background monitoring remains unavailable until PHASE 05.
+- Navy and ivory themes with violet accent; 960×620 DIP minimum, 1180×780 default. Bounded lists recycle containers; only overview/settings and the detail pane scroll. Text values use system fonts Segoe UI / Microsoft YaHei UI.
+- All interface labels/accessibility names use matching zh-CN/en-US dictionaries. Changing language preserves results, query choices, selected snapshot pair and detail. Native date presentation follows WPF culture behavior; numeric dates carry no root-cause meaning.
+- Keyboard: F5 scans, Enter searches, Tab/Shift+Tab follows controls, lists support selection and controls have visible focus. Loading disables query controls and shows a thin progress indicator. Empty and error states stay concise and distinct.
 
-PHASE 02 displays UTC-backed observation windows in local time, at second resolution. These are times when synthetic examples were processed, never claimed occurrence times of a real system change. 页面仅显示必要的演示状态与观察区间；显示精度为秒，不把处理时刻声称为真实变化的发生时刻。
+Validate all five pages × both languages × both themes at 960×620, render at 100/150/200% raster scale, inspect representative layouts and binding logs, exercise keyboard focus and app close. Raster-scale render checks supplement physical DPI validation; they do not simulate Windows per-monitor DPI transitions. Record physical monitor switching and full manual keyboard traversal as NOT RUN unless actually performed.
 
-五页面统一侧栏、功能标题与必要状态。用户要求简洁少字：不使用口号、装饰性主题标题、营销句或重复解释；风格由留白、排版、配色与一致控件体现。文字只用于识别功能、说明状态、支持操作。变化详情留待第四阶段；演示标识始终可见。中英文与深浅主题实时切换，内容可滚动，长文案换行。所有文案与无障碍名称来自双语资源。未开放的操作须明确状态。
-
-Verify 100%, 150% and 200% DPI, keyboard focus, 960×620 minimum, both languages and themes. Record unperformed manual checks as NOT RUN.
-
-手工验收包含三种 DPI、键盘焦点、最小尺寸、双语与双主题；未完成项必须记为 NOT RUN。
+验收区分自动渲染缩放和实机 DPI 切换。不能用截图渲染代替显示器切换测试；未执行项明确记录 NOT RUN。历史阶段的 Demo 界面约束已由第四阶段移除演示入口的要求取代。

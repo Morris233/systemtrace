@@ -1,5 +1,19 @@
 # Data model / 数据模型
 
+## PHASE 04 queries and schema 2 / 第四阶段查询与迁移
+
+- ChangeQuery accepts literal text (up to 512 characters), an optional category and optional inclusive UTC observation-window bounds. Pages are zero based, default 40, allowed size 1–100. Out-of-range positive pages clamp to the last page. Results sort by observed_to_utc DESC, id DESC within one consistent transaction.
+- Text search covers stable identity, category/kind identifiers, field names, before/after values and error codes. Text is normalized to Unicode NFC and invariant uppercase for literal substring matching; SQL metacharacters are data, not wildcards. This is not culture-specific linguistic search, and translated UI category/status labels are not indexed. Category has a separate localized filter.
+- Window matching is overlap: observed_to_utc >= requested_from AND observed_from_utc <= requested_to. A change whose observation interval crosses the issue time may match. The result is a clue, never proof of cause or an exact occurrence time. UI accepts local HH:mm or HH:mm:ss and converts to UTC; invalid or ambiguous daylight-saving times are rejected.
+- ChangePreview stores a label capped at 200 characters and value previews at 256 (plus an ellipsis). The full Change and all fields remain intact for on-demand detail. Missing field, null, empty string and unreadable value remain distinct. Changed fields appear first; all fields and exact source identity remain readable/copyable. Device absence is labeled Not detected this scan.
+- SnapshotHeader contains only identity, category, UTC observation time and item count. Only successful category results enter snapshots. Comparison requires two distinct successful snapshots, same category and non-reversed time. It is read-only and does not append historical events.
+- DashboardSummary includes latest attempt, latest all-four-success run, retained category baseline sizes/times, nullable latest change counts, diagnostics and the newest 8 previews. A Partial/Failed/Skipped category has no current count; it does not become a zero-change success.
+- Schema 1 -> 2 adds changes.search_text and changes.summary_json, snapshots.item_count, and category/time indexes. The migration checks version again under an immediate transaction, backfills in batches of 128 changes, supports cancellation checkpoints and commits version 2 only after success. Injected backfill failure rolls back all added columns/indexes and preserves version 1 and evidence. JSON counts use SQLite's [built-in JSON functions](https://www.sqlite.org/json1.html). Database filename remains system-v1.db.
+- Search text and summaries duplicate existing evidence only in the same local database. They do not add collection or network requests. Old schema JSON remains compatible. No historical data is removed.
+
+查询按观察区间相交检索，时间端点包含在内；不是按“故障发生时间”推断变化。全文为字面子串、统一大小写与 NFC 规范化，分页稳定且有上限。schema 2 原子补齐摘要、检索文本和快照数量；迁移故障不会留下半完成结构。原演示库保留在磁盘但不再由应用访问。
+
+
 ## PHASE 03 additions / 第三阶段补充
 
 CollectionResult adds optional SkippedItemCount (default 0) and Warnings (default empty); old JSON remains readable without a schema change. Software records display name/version/publisher/system-component and exact registry source; no uninstall command or install path is captured. Startup records value name/command/source/hive/view/key, or folder scope/relative filename/last-write signal. Commands and source paths can be sensitive; they stay in the local system database and are excluded from Git/artifacts.

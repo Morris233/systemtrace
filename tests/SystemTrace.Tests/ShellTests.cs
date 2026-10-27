@@ -33,15 +33,6 @@ public sealed class ShellTests
         Assert.Equal(expected, LanguagePolicy.Resolve(culture));
 
     [Fact]
-    public void DemoIsExplicitAndContainsOnlyFourSyntheticCategories()
-    {
-        var first = DemoSession.CreateRun(0, DateTimeOffset.UtcNow);
-        Assert.True(first.IsDemo);
-        Assert.Equal(Enum.GetValues<InventoryCategory>(), first.Results.Select(x => x.Category));
-        Assert.All(first.Results.SelectMany(result => result.Items), item => Assert.StartsWith("demo/", item.StableKey));
-    }
-
-    [Fact]
     public void CoreDoesNotReferencePlatformOrPersistenceAssemblies()
     {
         var references = typeof(IScanRepository).Assembly.GetReferencedAssemblies();
@@ -75,7 +66,7 @@ public sealed class ShellTests
     }
 
     [Fact]
-    public void RealWpfShellRendersEveryPageAndUpdatesResourcesLive()
+    public void ProductionPagesRenderAndRetainFiltersDetailsAcrossLanguages()
     {
         RunSta(() =>
         {
@@ -88,24 +79,49 @@ public sealed class ShellTests
             {
                 var appearance = new AppearanceService(app.Resources, "en-US");
                 app.Resources.MergedDictionaries.Add(Load("Styles.xaml"));
-                var english = Load("Strings/en-US.xaml");
-                var chinese = Load("Strings/zh-CN.xaml");
+                var english = Load("Strings/en-US.xaml"); var chinese = Load("Strings/zh-CN.xaml");
                 var keys = english.Keys.Cast<string>().Order().ToArray();
                 Assert.Equal(keys, chinese.Keys.Cast<string>().Order().ToArray());
-                Assert.All(keys, key =>
-                {
-                    Assert.False(string.IsNullOrWhiteSpace(english[key] as string));
-                    Assert.False(string.IsNullOrWhiteSpace(chinese[key] as string));
-                });
-                Assert.Contains("DEMO", app.FindResource("DemoNotice").ToString());
-                using var store = new TestStore();
-                var vm = new MainViewModel(new DemoSession(store.Repository), appearance, NullLogger<MainViewModel>.Instance);
+                Assert.All(keys, key => { Assert.False(string.IsNullOrWhiteSpace(english[key] as string)); Assert.False(string.IsNullOrWhiteSpace(chinese[key] as string)); });
+                using var store = new TestStore(false);
+                Pump(store.Repository.CommitAsync(HistoryReaderTests.Run(0, 55)));
+                Pump(store.Repository.CommitAsync(HistoryReaderTests.Run(1, 55)));
+                var vm = new MainViewModel(new EmptySession(), store.Repository, appearance, NullLogger<MainViewModel>.Instance);
                 Pump(vm.InitializeAsync());
-                Assert.Equal(0, vm.History.TotalRuns);
-                Pump(vm.ScanCommand.ExecuteAsync(null));
-                Assert.Empty(vm.History.Changes);
-                Pump(vm.ScanCommand.ExecuteAsync(null));
-                Assert.Equal(4, vm.History.Changes.Count);
+                Assert.Equal(2, vm.Dashboard.TotalRuns);
+                Assert.Equal(40, vm.TimelineRows.Count);
+                Assert.True(vm.NextTimelineCommand.CanExecute(null));
+                Pump(vm.NextTimelineCommand.ExecuteAsync(null));
+                Assert.Null(vm.TimelineDetail);
+                vm.SearchText = "%_';--";
+                vm.TimelineCategory = vm.FilterOptions.Single(o => o.Value == InventoryCategory.Software);
+                Pump(vm.SearchCommand.ExecuteAsync(null));
+                var row = Assert.Single(vm.TimelineRows);
+                vm.SelectedTimelineRow = row;
+                Pump(vm.OpenTimelineCommand.ExecutionTask!);
+                Assert.NotNull(vm.TimelineDetail);
+                Assert.Contains(vm.TimelineDetail.Fields, f => f.Before == "0" && f.After == "1");
+                vm.BeforeSnapshot = vm.SnapshotChoices[1]; vm.AfterSnapshot = vm.SnapshotChoices[0];
+                Assert.True(vm.CompareCommand.CanExecute(null));
+                Pump(vm.CompareCommand.ExecuteAsync(null));
+                Assert.Equal(40, vm.ComparisonRows.Count);
+                vm.SelectedComparisonRow = vm.ComparisonRows[0];
+                Assert.NotNull(vm.ComparisonDetail);
+                var pair = (vm.BeforeSnapshot.Header.Id, vm.AfterSnapshot.Header.Id);
+                var detailId = vm.TimelineDetail.Evidence.Id;
+                vm.IncidentDate = HistoryReaderTests.Time.ToLocalTime().Date;
+                vm.IncidentTime = "invalid";
+                Pump(vm.SearchTroubleCommand.ExecuteAsync(null));
+                Assert.Equal(appearance.Text("InvalidIncidentTime"), vm.ErrorMessage);
+                vm.ToggleLanguageCommand.Execute(null);
+                Assert.Equal(appearance.Text("InvalidIncidentTime"), vm.ErrorMessage);
+                vm.ToggleLanguageCommand.Execute(null);
+                vm.IncidentTime = HistoryReaderTests.Time.AddMinutes(1).ToLocalTime().ToString("HH:mm:ss");
+                vm.TroubleCategory = vm.FilterOptions.Single(o => o.Value == InventoryCategory.Software);
+                Pump(vm.SearchTroubleCommand.ExecuteAsync(null));
+                Assert.Equal(40, vm.TroubleRows.Count);
+                Pump(vm.OpenTroubleCommand.ExecuteAsync(vm.TroubleRows[0]));
+                Assert.NotNull(vm.TroubleDetail);
                 var window = new MainWindow(vm) { Width = 960, Height = 620, ShowInTaskbar = false };
                 window.Show();
                 try
@@ -113,86 +129,59 @@ public sealed class ShellTests
                     foreach (var language in new[] { "en-US", "zh-CN" })
                     {
                         if (appearance.Language != language) vm.ToggleLanguageCommand.Execute(null);
+                        Assert.Equal("%_';--", vm.SearchText);
+                        Assert.Equal(InventoryCategory.Software, vm.TimelineCategory!.Value);
+                        Assert.Equal(detailId, vm.TimelineDetail!.Evidence.Id);
+                        Assert.Equal(pair, (vm.BeforeSnapshot!.Header.Id, vm.AfterSnapshot!.Header.Id));
+                        Assert.NotNull(vm.ComparisonDetail);
                         foreach (var dark in new[] { true, false })
                         {
                             if (appearance.IsDark != dark) vm.ToggleThemeCommand.Execute(null);
-                            Assert.Equal(language == "en-US" ? "Overview" : "概览", app.FindResource("Overview"));
-                            var color = ((SolidColorBrush)app.FindResource("BackgroundBrush")).Color;
-                            Assert.Equal(dark ? Color.FromRgb(17, 19, 28) : Color.FromRgb(246, 245, 242), color);
                             for (var page = 0; page < 5; page++)
                             {
                                 vm.SelectedPageIndex = page;
-                                window.UpdateLayout();
-                                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                                window.UpdateLayout();
-                                var view = Descendants(window).OfType<UserControl>().Single();
-                                Assert.True(view.ActualWidth > 0);
-                                var renderedText = Descendants(window).OfType<TextBlock>().Select(t => t.Text).ToArray();
-                                Assert.Contains(renderedText, text => text.Contains("DEMO", StringComparison.Ordinal));
-                                var titleKey = new[] { "OverviewTitle", "TimelineTitle", "SnapshotsTitle", "TroubleshootTitle", "SettingsTitle" }[page];
-                                Assert.Contains(app.FindResource(titleKey).ToString(), renderedText);
-                                SavePreview(window, $"{language}-{(dark ? "dark" : "light")}-{page}");
+                                Layout(window);
+                                var rendered = Descendants(window).OfType<TextBlock>().Select(t => t.Text).ToArray();
+                                Assert.DoesNotContain(rendered, text => text.Contains("DEMO", StringComparison.OrdinalIgnoreCase));
+                                Assert.DoesNotContain(rendered, text => text.Contains("CategoryOption {") || text.Contains("WindowOption {") || text.Contains("SnapshotOption {"));
+                                var title = new[] { "OverviewTitle", "TimelineTitle", "SnapshotsTitle", "TroubleshootTitle", "SettingsTitle" }[page];
+                                Assert.Contains(appearance.Text(title), rendered);
+                                Assert.True(Descendants(window).OfType<UserControl>().All(v => v.ActualWidth > 0));
+                                foreach (var scale in new[] { 1d, 1.5d, 2d })
+                                    SavePreview(window, $"{language}-{(dark ? "dark" : "light")}-{page}-{(int)(scale * 100)}", scale);
                             }
                         }
                     }
-                    // Repeated switching must not accumulate dictionaries.
                     Assert.Equal(3, app.Resources.MergedDictionaries.Count);
-                    window.Width = 1180;
-                    window.Height = 780;
-                    vm.SelectedPageIndex = 0;
+                    window.Width = 1180; window.Height = 780;
                     if (!appearance.IsDark) vm.ToggleThemeCommand.Execute(null);
-                    window.UpdateLayout();
-                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                    SavePreview(window, "overview-zh-CN-dark");
-                    using var systemStore = new TestStore(isDemo: false);
-                    var devices = new CollectorTests.FakeDevices { Batch = SourceBatch<DeviceEntry>.Complete(CollectorTests.Device("1")) };
-                    var network = new CollectorTests.FakeNetwork
+                    foreach (var page in new[] { 0, 1, 2, 3 })
                     {
-                        Batch = SourceBatch<AdapterEntry>.Complete(new AdapterEntry(Guid.NewGuid(), "Sample adapter", "Sample", "Ethernet", "Up"))
-                    };
-                    var system = new SystemScanSession(systemStore.Repository,
-                        [new SoftwareCollector(new CollectorTests.FakeRegistry()), new StartupCollector(new CollectorTests.FakeRegistry(), new CollectorTests.FakeFiles()),
-                         new DriverCollector(devices), new NetworkCollector(network)]);
-                    var live = new MainViewModel(new DemoSession(store.Repository), appearance, NullLogger<MainViewModel>.Instance, system);
-                    window.DataContext = live;
-                    Pump(live.InitializeAsync());
-                    Assert.False(live.IsDemo);
-                    Assert.Equal(0, live.History.TotalRuns);
-                    Pump(live.ScanCommand.ExecuteAsync(null));
-                    Assert.Empty(live.History.Changes);
-                    devices.Batch = SourceBatch<DeviceEntry>.Complete(CollectorTests.Device("2"));
-                    Pump(live.ScanCommand.ExecuteAsync(null));
-                    devices.Batch = SourceBatch<DeviceEntry>.Complete();
-                    network.Batch = new SourceBatch<AdapterEntry>([], ["AccessDenied"]);
-                    Pump(live.ScanCommand.ExecuteAsync(null));
-                    Assert.Contains(((TimelinePageViewModel)live.Pages[1]).Rows, row => row.KindText == appearance.Text("NotDetected"));
-                    Assert.Equal(appearance.Text("Partial"), ((OverviewPageViewModel)live.Pages[0]).Results[3].StatusText);
-                    window.Width = 960;
-                    window.Height = 620;
-                    foreach (var language in new[] { "en-US", "zh-CN" })
-                    {
-                        if (appearance.Language != language) live.ToggleLanguageCommand.Execute(null);
-                        foreach (var dark in new[] { true, false })
-                        {
-                            if (appearance.IsDark != dark) live.ToggleThemeCommand.Execute(null);
-                            for (var page = 0; page < 5; page++)
-                            {
-                                live.SelectedPageIndex = page;
-                                window.UpdateLayout();
-                                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                                var text = Descendants(window).OfType<TextBlock>().Select(t => t.Text).ToArray();
-                                Assert.Contains(appearance.Text("LocalNotice"), text);
-                                Assert.DoesNotContain(text, value => value.Contains("DEMO", StringComparison.Ordinal));
-                                SavePreview(window, $"system-{language}-{(dark ? "dark" : "light")}-{page}");
-                            }
-                        }
+                        vm.SelectedPageIndex = page; Layout(window);
+                        SavePreview(window, $"normal-zh-dark-{page}", 1);
                     }
-                    Pump(live.ToggleModeCommand.ExecuteAsync(null));
-                    Assert.True(live.IsDemo);
-                    Assert.Equal(2, live.History.TotalRuns);
-                    Pump(live.ToggleModeCommand.ExecuteAsync(null));
-                    Assert.False(live.IsDemo);
-                    Assert.Equal(3, live.History.TotalRuns);
+                    // Empty history uses the same production pages and creates no store.
+                    var empty = new MainViewModel(new EmptySession(), new ViewModelTests.EmptyReader(), appearance, NullLogger<MainViewModel>.Instance);
+                    Pump(empty.InitializeAsync());
+                    window.DataContext = empty;
+                    for (var page = 0; page < 5; page++)
+                    {
+                        empty.SelectedPageIndex = page; Layout(window);
+                        SavePreview(window, $"empty-zh-dark-{page}", 1);
+                    }
+                    window.DataContext = vm;
+                    vm.SelectedPageIndex = 2; Layout(window);
+                    var categoryPicker = Descendants(window).OfType<ComboBox>().Single(c => c.ItemsSource == vm.SnapshotCategories);
+                    categoryPicker.IsDropDownOpen = true; Layout(window);
+                    Assert.IsType<ComboBoxItem>(categoryPicker.ItemContainerGenerator.ContainerFromIndex(0));
+                    categoryPicker.IsDropDownOpen = false; Layout(window);
+                    // Actual WPF templates contain bounded scrolling lists, no production demo switch.
+                    vm.SelectedPageIndex = 1; Layout(window);
+                    var list = Descendants(window).OfType<ListBox>().Single(l => l.ItemsSource == vm.TimelineRows);
+                    Assert.True(VirtualizingPanel.GetIsVirtualizing(list));
+                    var search = Descendants(window).OfType<TextBox>().First(t => t.Text == vm.SearchText);
+                    Assert.True(search.Focus());
+                    Assert.True(search.IsKeyboardFocused);
                 }
                 finally { window.Close(); }
                 listener.Flush();
@@ -201,10 +190,16 @@ public sealed class ShellTests
             finally
             {
                 PresentationTraceSources.DataBindingSource.Listeners.Remove(listener);
-                listener.Dispose();
-                app.Shutdown();
+                listener.Dispose(); app.Shutdown();
             }
         });
+    }
+
+    private static void Layout(Window window)
+    {
+        window.UpdateLayout();
+        window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+        window.UpdateLayout();
     }
 
     [Fact]
@@ -246,7 +241,7 @@ public sealed class ShellTests
     };
 
     private static MainViewModel CreateViewModel(IAppearanceService appearance) =>
-        new(new EmptySession(), appearance, NullLogger<MainViewModel>.Instance);
+        new(new EmptySession(), new ViewModelTests.EmptyReader(), appearance, NullLogger<MainViewModel>.Instance);
 
     private static void Pump(Task task)
     {
@@ -260,7 +255,7 @@ public sealed class ShellTests
         task.GetAwaiter().GetResult();
     }
 
-    private sealed class EmptySession : IDemoSession
+    private sealed class EmptySession : ISystemScanSession
     {
         public Task<InventoryHistory> LoadAsync(CancellationToken cancellationToken = default) => Task.FromResult(InventoryHistory.Empty);
         public Task<InventoryHistory> RunAsync(CancellationToken cancellationToken = default) => Task.FromResult(InventoryHistory.Empty);
@@ -276,13 +271,13 @@ public sealed class ShellTests
         }
     }
 
-    private static void SavePreview(Window window, string name)
+    private static void SavePreview(Window window, string name, double scale = 1)
     {
         var folder = Environment.GetEnvironmentVariable("SYSTEMTRACE_QA_DIR");
         if (string.IsNullOrEmpty(folder)) return;
         Directory.CreateDirectory(folder);
         var content = (FrameworkElement)window.Content;
-        var bitmap = new RenderTargetBitmap((int)content.ActualWidth, (int)content.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+        var bitmap = new RenderTargetBitmap((int)(content.ActualWidth * scale), (int)(content.ActualHeight * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);
         bitmap.Render(content);
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(bitmap));
@@ -305,7 +300,7 @@ public sealed class ShellTests
         { IsBackground = true };
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
-        Assert.True(thread.Join(TimeSpan.FromSeconds(60)), "WPF test timed out");
+        Assert.True(thread.Join(TimeSpan.FromSeconds(120)), "WPF test timed out");
         if (failure is not null) ExceptionDispatchInfo.Capture(failure).Throw();
     }
 

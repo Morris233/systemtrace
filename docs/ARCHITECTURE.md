@@ -1,5 +1,18 @@
 # Architecture / 架构
 
+## PHASE 04 current architecture / 第四阶段现状
+
+App now composes one system repository/session and an IHistoryReader. Production contains no demo generator, demo interface or mode switch. Synthetic SampleSession and fixture inventory exist only in the test assembly. Existing demo-v1.db is ignored and never deleted. The system filename remains system-v1.db for compatibility; its schema advances transactionally to version 2.
+
+Core owns ChangeQuery, bounded PageResult, lightweight ChangePreview, SnapshotHeader and DashboardSummary contracts. Infrastructure executes filtering/counting/paging in SQLite on worker tasks, using one consistent read transaction per operation. App holds at most 40 rows per list, 8 recent previews, one selected detail per page, and 40 snapshot headers plus at most two pinned selections. A virtualized list with recycling is bounded by the page grid; it is not nested in an outer unbounded ScrollViewer. See [WPF control performance](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/optimizing-performance-controls).
+
+Dashboard queries distinguish the latest attempt from the latest run where all four categories succeeded. Per-category latest counts are nullable for unsuccessful outcomes; the retained baseline is shown separately. Full inventory is not deserialized for the dashboard. Detail loads persisted full evidence by change ID. Successful snapshot comparison reads two snapshots in a transaction, validates same category and chronological order, computes cancellable diffs on a worker, and returns a bounded result page without writing events or baselines.
+
+A single view-model work gate prevents overlapping UI operations. Close cancels the lifetime token. Failed operations show a localized retryable error and retain previously loaded evidence. Search/category/window inputs apply on Search or Enter; language changes relabel existing results without a new query and preserve filters, selections and evidence. Large substring searches can still scan matching history; they are off the UI thread and do not load the whole history into WPF. Comparison work is proportional to the two selected inventories, not total history.
+
+第四阶段仅使用本机历史，移除演示入口和生产代码中的虚构数据生成器。数据库分页与详情按需读取均在后台线程执行，界面列表每页 40 条，快照选择跨页保留已选两项。失败类别显示未知数量而非零；上次完整成功与最近尝试分别显示。快照比较只读，不产生新的持久事件。关闭窗口取消工作；不包含第五阶段的调度、托盘、导出或自启。
+
+
 Initialization supplement, not the missing original design. 本次初始化补充，非缺失原稿。
 
 ## PHASE 03

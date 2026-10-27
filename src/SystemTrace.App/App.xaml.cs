@@ -21,10 +21,11 @@ public partial class App : Application
         services = new ServiceCollection()
             .AddLogging()
             .AddSingleton<IAppearanceService>(resources)
-            .AddSingleton<IScanRepository>(_ => new SqliteScanRepository(
+            .AddSingleton<SqliteScanRepository>(_ => new SqliteScanRepository(
                 System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "SystemTrace", "demo-v1.db"), isDemo: true))
-            .AddSingleton<IDemoSession, DemoSession>()
+                    "SystemTrace", "system-v1.db"), isDemo: false))
+            .AddSingleton<IScanRepository>(provider => provider.GetRequiredService<SqliteScanRepository>())
+            .AddSingleton<IHistoryReader>(provider => provider.GetRequiredService<SqliteScanRepository>())
             .AddSingleton<IRegistrySource, WindowsRegistrySource>()
             .AddSingleton<IStartupFileSource, WindowsStartupFileSource>()
             .AddSingleton<IDeviceSource, WindowsDeviceSource>()
@@ -34,8 +35,7 @@ public partial class App : Application
             .AddSingleton<ISystemCollector, DriverCollector>()
             .AddSingleton<ISystemCollector, NetworkCollector>()
             .AddSingleton<ISystemScanSession>(provider => new SystemScanSession(
-                new SqliteScanRepository(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "SystemTrace", "system-v1.db"), isDemo: false), provider.GetServices<ISystemCollector>()))
+                provider.GetRequiredService<IScanRepository>(), provider.GetServices<ISystemCollector>()))
             .AddSingleton<MainViewModel>()
             .AddSingleton<MainWindow>()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });

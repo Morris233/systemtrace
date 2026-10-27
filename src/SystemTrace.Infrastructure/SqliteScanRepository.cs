@@ -8,7 +8,7 @@ using SystemTrace.Core;
 
 namespace SystemTrace.Infrastructure;
 
-public sealed class SqliteScanRepository : IScanRepository
+public sealed partial class SqliteScanRepository : IScanRepository, IHistoryReader
 {
     private readonly string databasePath;
     private readonly bool isDemo;
@@ -36,7 +36,7 @@ public sealed class SqliteScanRepository : IScanRepository
         var json = JsonSerializer.Serialize(run);
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(json)));
         Directory.CreateDirectory(Path.GetDirectoryName(databasePath)!);
-        using var connection = Open();
+        using var connection = Open(token);
         using var transaction = connection.BeginTransaction(deferred: false);
         using (var existing = Command(connection, transaction, "SELECT input_hash FROM scan_runs WHERE id=$id", ("$id", run.Id.ToString())))
         {
@@ -68,19 +68,20 @@ public sealed class SqliteScanRepository : IScanRepository
                 if (baseline.ExecuteScalar() is string evidence) previous = Deserialize<Snapshot>(evidence);
             }
             var current = new Snapshot(Guid.NewGuid(), run.Id, result.Category, result.CompletedAtUtc, result.Items);
-            var changes = diff.Compare(previous, current);
+            var changes = diff.Compare(previous, current, token);
             Execute(connection, transaction,
-                "INSERT INTO snapshots(id,scan_id,category,observed_utc,evidence_json) VALUES($id,$run,$category,$observed,$json)",
+                "INSERT INTO snapshots(id,scan_id,category,observed_utc,evidence_json,item_count) VALUES($id,$run,$category,$observed,$json,$count)",
                 ("$id", current.Id.ToString()), ("$run", run.Id.ToString()), ("$category", (int)result.Category),
-                ("$observed", Utc(current.ObservedAtUtc)), ("$json", JsonSerializer.Serialize(current)));
+                ("$observed", Utc(current.ObservedAtUtc)), ("$json", JsonSerializer.Serialize(current)), ("$count", current.Items.Count));
             foreach (var change in changes)
             {
                 token.ThrowIfCancellationRequested();
                 Execute(connection, transaction,
-                    "INSERT INTO changes(id,snapshot_id,category,stable_key,kind,observed_from_utc,observed_to_utc,evidence_json) VALUES($id,$snapshot,$category,$key,$kind,$from,$to,$json)",
+                    "INSERT INTO changes(id,snapshot_id,category,stable_key,kind,observed_from_utc,observed_to_utc,evidence_json,search_text,summary_json) VALUES($id,$snapshot,$category,$key,$kind,$from,$to,$json,$search,$summary)",
                     ("$id", change.Id), ("$snapshot", current.Id.ToString()), ("$category", (int)change.Category),
                     ("$key", change.StableKey), ("$kind", (int)change.Kind), ("$from", Utc(change.ObservedFromUtc)),
-                    ("$to", Utc(change.ObservedToUtc)), ("$json", JsonSerializer.Serialize(change)));
+                    ("$to", Utc(change.ObservedToUtc)), ("$json", JsonSerializer.Serialize(change)),
+                    ("$search", SearchText(change)), ("$summary", JsonSerializer.Serialize(ChangePreviews.Create(change))));
             }
             totalChanges += changes.Count;
             Execute(connection, transaction,
@@ -96,7 +97,7 @@ public sealed class SqliteScanRepository : IScanRepository
     {
         token.ThrowIfCancellationRequested();
         if (!File.Exists(databasePath)) return InventoryHistory.Empty;
-        using var connection = Open();
+        using var connection = Open(token);
         using var transaction = connection.BeginTransaction(deferred: true);
         using var count = Command(connection, transaction, "SELECT COUNT(*) FROM scan_runs");
         var total = Convert.ToInt32(count.ExecuteScalar(), CultureInfo.InvariantCulture);
@@ -116,7 +117,7 @@ public sealed class SqliteScanRepository : IScanRepository
             new ReadOnlyDictionary<InventoryCategory, int>(counts));
     }
 
-    private SqliteConnection Open()
+    private SqliteConnection Open(CancellationToken token)
     {
         var connection = new SqliteConnection(new SqliteConnectionStringBuilder
         {
@@ -130,7 +131,7 @@ public sealed class SqliteScanRepository : IScanRepository
             Execute(connection, null, "PRAGMA foreign_keys=ON");
             using var versionQuery = Command(connection, null, "PRAGMA user_version");
             var version = Convert.ToInt32(versionQuery.ExecuteScalar(), CultureInfo.InvariantCulture);
-            if (version > 1) throw new InvalidOperationException("Database schema is newer than this application");
+            if (version > 2) throw new InvalidOperationException("Database schema is newer than this application");
             if (version == 0)
             {
                 using var migration = connection.BeginTransaction(deferred: false);
@@ -149,6 +150,7 @@ public sealed class SqliteScanRepository : IScanRepository
             using var origin = Command(connection, null, "SELECT is_demo FROM store_info WHERE id=1");
             if (origin.ExecuteScalar() is not long storedOrigin || storedOrigin != (isDemo ? 1 : 0))
                 throw new InvalidOperationException("Database origin mismatch");
+            UpgradeQueries(connection, token);
             return connection;
         }
         catch { connection.Dispose(); throw; }

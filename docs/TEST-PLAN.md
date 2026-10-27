@@ -1,5 +1,24 @@
 # Test plan / 测试计划
 
+## PHASE 04 acceptance / 第四阶段验收
+
+Current automated suite replaces the historical Demo UI checks with production system-history checks. Earlier phase sections below describe their original milestones and are not current UI requirements.
+
+- Query 2,400 persisted changes with deterministic bounded pages, page clamping, literal SQL-looking text, Unicode NFC/case normalization, category and before-value search; invalid queries rejected.
+- Inclusive overlap at both ends, crossing intervals, timezone offsets, outside-range exclusion. Troubleshooting never asserts cause.
+- Latest attempt versus latest all-four-success; unsuccessful latest category has unknown current count and retained baseline; newest 8 previews only.
+- Successful-only snapshot headers; 43-snapshot catalogue paging retains a selected pair; invalid pair disables compare; read-only comparison leaves run/change/baseline counts unchanged.
+- Full evidence loading by ID, clipped previews, long copyable values and missing/null/empty/unreadable distinction; changed fields first and PnP absence wording.
+- Schema 1 -> 2 backfill over multiple batches, repeat queries after migration, injected SQL failure rolls back columns/version/data; empty/cancelled queries do not create a store.
+- Search/page changes clear stale detail; recent item opens persisted evidence; filter/pair/detail selections survive language changes; validation errors preserve their meaning when translated.
+- Real WPF resources and templates, all five pages × two languages × two themes × raster scales 100/150/200% at minimum window size, binding-error capture, selection-box labels and keyboard focus. Additional normal-size renders.
+- Existing domain, persistence, fake collector and 3 real Windows integration tests remain active. Actual executable starts and exits normally without remaining resident.
+
+Manual verification: inspect representative rendered pages in both themes and languages, including long evidence and empty history. Raster-scale rendering is automated; **physical Windows DPI switching / mixed-DPI monitors and full manual Tab/Shift+Tab traversal remain NOT RUN** until performed. Real software install/uninstall also remains NOT RUN; registry mutations are isolated fixture keys only. No user display settings are changed during tests. Large-history tests verify bounded results and worker dispatch, not million-record latency guarantees.
+
+第四阶段自动化覆盖分页、字面搜索、区间相交、失败保护、只读对比、迁移回滚和界面状态。实机 DPI 切换、完整键盘手工遍历和真实软件安装实验没有执行；不能以渲染图代替这些手工结果。
+
+
 Initialization supplement, not the missing original T001–T026 plan. 本次新增；未取得原 T001–T026，不冒充原测试清单。
 
 ## PHASE 01 automated acceptance
