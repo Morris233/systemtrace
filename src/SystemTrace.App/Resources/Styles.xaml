@@ -241,6 +241,8 @@
     <Setter Property="ItemContainerStyle">
       <Setter.Value>
         <Style TargetType="ListBoxItem">
+          <Setter Property="AutomationProperties.Name" Value="{Binding Label}"/>
+          <Setter Property="AutomationProperties.HelpText" Value="{Binding Window}"/>
           <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
           <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
           <Setter Property="Padding" Value="14"/>
@@ -322,6 +324,35 @@
   <Style TargetType="CheckBox">
     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
     <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="CheckBox">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="18"/>
+              <ColumnDefinition Width="8"/>
+              <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="Mark" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="4" Width="18" Height="18" VerticalAlignment="Center">
+              <Path x:Name="Tick" Data="M 3,8 L 7,12 L 14,4" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" Visibility="Collapsed"/>
+            </Border>
+            <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+              <Setter TargetName="Mark" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Mark" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
   </Style>
   <Style x:Key="BusyPanel" TargetType="StackPanel">
     <Setter Property="Visibility" Value="Collapsed"/>
@@ -357,5 +388,8 @@
         <Setter Property="Visibility" Value="Collapsed"/>
       </Trigger>
     </Style.Triggers>
+  </Style>
+  <Style TargetType="Expander">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
   </Style>
 </ResourceDictionary>

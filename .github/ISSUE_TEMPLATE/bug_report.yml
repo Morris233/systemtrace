@@ -1,0 +1,28 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem / 提交可复现问题
+body:
+  - type: input
+    id: version
+    attributes:
+      label: App version / 应用版本
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build / 系统版本
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps / 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual / 预期与实际
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: Use synthetic data or a reviewed redacted report. Do not upload inventory databases, raw commands, personal paths or credentials. / 请使用虚构数据或已检查的脱敏报告，不上传原始数据库、命令、个人路径或凭证。

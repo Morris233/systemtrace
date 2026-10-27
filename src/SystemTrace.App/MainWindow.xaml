@@ -1,4 +1,4 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="clr-namespace:SystemTrace.App.ViewModels" xmlns:views="clr-namespace:SystemTrace.App.Views" x:Class="SystemTrace.App.MainWindow" Title="{DynamicResource AppName}" Width="1180" Height="780" MinWidth="960" MinHeight="620" WindowStartupLocation="CenterScreen" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14" Language="{Binding DisplayLanguage}">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="clr-namespace:SystemTrace.App.ViewModels" xmlns:views="clr-namespace:SystemTrace.App.Views" x:Class="SystemTrace.App.MainWindow" Icon="Assets/SystemTrace.ico" Title="{DynamicResource AppName}" Width="1180" Height="780" MinWidth="960" MinHeight="620" WindowStartupLocation="CenterScreen" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14" Language="{Binding DisplayLanguage}">
   <Window.InputBindings>
     <KeyBinding Key="F5" Command="{Binding ScanCommand}"/>
   </Window.InputBindings>
@@ -57,7 +57,7 @@
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Style="{StaticResource IdlePanel}">
           <Button Content="{DynamicResource LanguageToggle}" Command="{Binding ToggleLanguageCommand}" Margin="0,0,8,0"/>
           <Button Content="{DynamicResource ThemeToggle}" Command="{Binding ToggleThemeCommand}" Margin="0,0,8,0"/>
-          <Button Content="{DynamicResource ScanNow}" Command="{Binding ScanCommand}" Background="{DynamicResource AccentSoftBrush}"/>
+          <Button Content="{Binding ScanActionText}" Command="{Binding ScanCommand}" Background="{DynamicResource AccentSoftBrush}"/>
         </StackPanel>
         <TextBlock Text="{DynamicResource LocalNotice}" VerticalAlignment="Center" Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,12,0"/>
       </DockPanel>

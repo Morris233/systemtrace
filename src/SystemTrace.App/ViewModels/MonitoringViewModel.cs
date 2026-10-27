@@ -9,6 +9,7 @@ namespace SystemTrace.App.ViewModels;
 public partial class MainViewModel
 {
     public void ReportStartupIssue() => ShowError("SettingsUnreadable");
+    public string VersionText => "v" + typeof(MainViewModel).Assembly.GetName().Version?.ToString(3);
     public bool CanConfigure => application is not null;
     public AppPreferences Preferences => application?.Preferences ?? new AppPreferences();
     public event EventHandler? PreferencesApplied;
@@ -29,7 +30,7 @@ public partial class MainViewModel
     private bool CanPauseMonitoring() => CanConfigure && Preferences.BackgroundEnabled;
 
     private Task SaveAppearanceAsync() => application is null ? Task.CompletedTask :
-        WorkAsync(token => application.SaveAppearanceAsync(appearance.Language, appearance.IsDark, token));
+        WorkAsync(token => application.SaveAppearanceAsync(appearance.Language, appearance.IsDark, token), clearError: false);
     private void LoadPreferences()
     {
         BackgroundEnabled = Preferences.BackgroundEnabled;

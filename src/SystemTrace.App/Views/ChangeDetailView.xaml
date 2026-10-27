@@ -40,14 +40,14 @@
                       </Style>
                     </TextBlock.Style>
                   </TextBlock>
-                  <TextBox Grid.Column="1" Text="{Binding Before,Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" Margin="0,0,6,0" ToolTip="{Binding BeforeError}"/>
-                  <TextBox Grid.Column="2" Text="{Binding After,Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" ToolTip="{Binding AfterError}"/>
+                  <TextBox Grid.Column="1" Text="{Binding Before,Mode=OneWay}" AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{DynamicResource Before}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" Margin="0,0,6,0" ToolTip="{Binding BeforeError}"/>
+                  <TextBox Grid.Column="2" Text="{Binding After,Mode=OneWay}" AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{DynamicResource After}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" ToolTip="{Binding AfterError}"/>
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
           <Expander Header="{DynamicResource SourceIdentity}" Margin="0,10,0,0">
-            <TextBox Text="{Binding Identity,Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0"/>
+            <TextBox Text="{Binding Identity,Mode=OneWay}" AutomationProperties.Name="{DynamicResource SourceIdentity}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0"/>
           </Expander>
         </StackPanel>
       </ScrollViewer>

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Security.Principal;
 using System.Text.Json;
@@ -20,6 +21,7 @@ public sealed class WindowsIntegrationTests
             new StartupCollector(new WindowsRegistrySource(), new WindowsStartupFileSource()),
             new DriverCollector(new WindowsDeviceSource()), new NetworkCollector(new WindowsNetworkSource())];
         var session = new SystemScanSession(store.Repository, collectors);
+        var watch = Stopwatch.StartNew();
         var history = await session.RunAsync();
         Assert.Equal(1, history.TotalRuns);
         Assert.Empty(history.Changes);
@@ -34,6 +36,7 @@ public sealed class WindowsIntegrationTests
         if (summaryPath is not null)
             await File.WriteAllTextAsync(summaryPath, JsonSerializer.Serialize(new
             {
+                ElapsedMilliseconds = watch.ElapsedMilliseconds,
                 Elevated = elevated,
                 Baselines = history.Baselines.Count,
                 Categories = history.LastAttempt.Results.Select(r => new

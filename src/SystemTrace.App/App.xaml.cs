@@ -20,7 +20,8 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SystemTrace");
+        var folder = Environment.GetEnvironmentVariable("SYSTEMTRACE_DATA_DIR") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SystemTrace");
+        if (!Path.IsPathFullyQualified(folder)) throw new ArgumentException("Data directory must be absolute");
         instance = new SingleInstance(folder);
         if (!instance.IsOwner) { Shutdown(0); return; }
         var preferenceStore = new JsonPreferencesStore(Path.Combine(folder, "settings.json"));

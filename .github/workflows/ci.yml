@@ -25,6 +25,14 @@ jobs:
       - run: dotnet build --configuration Release --no-restore
       - run: dotnet test --configuration Release --no-build --logger trx
       - run: dotnet format --verify-no-changes --no-restore
+      - name: Verify self-contained Windows package
+        shell: pwsh
+        run: ./scripts/Build-Portable.ps1 -OutputDirectory artifacts/ci-package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: portable-ci
+          path: artifacts/ci-package/*
+          if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: always()
         with:

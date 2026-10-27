@@ -33,6 +33,7 @@ public partial class MainViewModel : ObservableObject
 
     public IReadOnlyList<object> Pages { get; }
     public DashboardSummary Dashboard => dashboard;
+    public string ScanActionText => presenter.Text(dashboard.Categories.Any(category => category.BaselineAtUtc is not null) ? "ScanNow" : "CreateBaseline");
     public object CurrentPage => Pages.ElementAtOrDefault(SelectedPageIndex) ?? Pages[0];
     public XmlLanguage DisplayLanguage => XmlLanguage.GetLanguage(appearance.Language);
     public ObservableCollection<SnapshotOption> SnapshotChoices { get; } = [];
@@ -110,12 +111,12 @@ public partial class MainViewModel : ObservableObject
             OpenTroubleCommand, OpenRecentCommand, ApplyPreferencesCommand, PruneHistoryCommand, ClearHistoryCommand, ExportJsonCommand, ExportCsvCommand }) command.NotifyCanExecuteChanged();
     }
 
-    private async Task WorkAsync(Func<CancellationToken, Task> action, CancellationToken token = default)
+    private async Task WorkAsync(Func<CancellationToken, Task> action, CancellationToken token = default, bool clearError = true)
     {
         if (!CanWork()) return;
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, lifetime.Token);
         IsBusy = true;
-        ShowError(null);
+        if (clearError) ShowError(null);
         StatusMessage = null;
         try { await action(linked.Token); }
         catch (OperationCanceledException) when (linked.IsCancellationRequested) { }
@@ -320,6 +321,7 @@ public partial class MainViewModel : ObservableObject
         CategoryRows = dashboard.Categories.Select(presenter.Category).ToArray();
         RecentRows = dashboard.RecentChanges.Select(presenter.Row).ToArray();
         OnPropertyChanged(nameof(Dashboard));
+        OnPropertyChanged(nameof(ScanActionText));
         OnPropertyChanged(nameof(LastAttemptText));
         OnPropertyChanged(nameof(LastCompleteText));
     }

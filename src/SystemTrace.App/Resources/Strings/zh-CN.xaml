@@ -146,4 +146,5 @@
   <sys:String x:Key="Exit">退出</sys:String>
   <sys:String x:Key="PauseMonitoring">暂停监测</sys:String>
   <sys:String x:Key="ResumeMonitoring">继续监测</sys:String>
+  <sys:String x:Key="CreateBaseline">建立基线</sys:String>
 </ResourceDictionary>

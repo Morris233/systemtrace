@@ -59,8 +59,10 @@ public sealed partial class SqliteScanRepository : IReportExporter
 
     private static string Csv(IEnumerable<string> values) => string.Join(',', values.Select(value =>
     {
-        var trimmed = value.TrimStart();
-        if (value.Length > 0 && (value[0] is '\t' or '\r' or '\n' || trimmed.Length > 0 && trimmed[0] is '=' or '+' or '-' or '@'))
+        var offset = 0;
+        while (offset < value.Length && (char.IsWhiteSpace(value[offset]) || char.IsControl(value[offset]) ||
+            char.GetUnicodeCategory(value[offset]) == UnicodeCategory.Format)) offset++;
+        if (value.Length > 0 && char.IsControl(value[0]) || offset < value.Length && value[offset] is '=' or '+' or '-' or '@')
             value = "'" + value;
         return "\"" + value.Replace("\"", "\"\"", StringComparison.Ordinal) + "\"";
     }));
@@ -68,8 +70,19 @@ public sealed partial class SqliteScanRepository : IReportExporter
     private sealed record ExportField(string Name, ExportValue Before, ExportValue After, bool Changed);
     private sealed record ExportValue(string State, string? Value, string? ErrorCode)
     {
-        private static readonly HashSet<string> SafeFields = ["version", "driver_version", "driver_date", "last_write_utc", "system_component",
-            "class", "interface_type", "operational_status", "source", "scope", "registry_hive", "registry_view"];
+        private static bool IsSafe(string name, string value) => name switch
+        {
+            "version" or "driver_version" => value.Length <= 80 && Regex.IsMatch(value, @"^[0-9]+(?:\.[0-9]+){0,7}$", RegexOptions.CultureInvariant),
+            "driver_date" or "last_write_utc" => DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out _),
+            "system_component" => value is "0" or "1",
+            "operational_status" => value is "Up" or "Down" or "Unknown" or "Dormant" or "NotPresent" or "LowerLayerDown" or "Testing",
+            "interface_type" => Enum.TryParse<System.Net.NetworkInformation.NetworkInterfaceType>(value, out var kind) && Enum.IsDefined(kind),
+            "source" => value is "Run" or "RunOnce" or "StartupFolder",
+            "scope" => value is "User" or "CurrentUser" or "Common",
+            "registry_hive" => value is "CurrentUser" or "LocalMachine",
+            "registry_view" => value is "Registry32" or "Registry64" or "Default",
+            _ => false
+        };
         public static ExportValue Create(FieldValue? field, string name, bool redact)
         {
             if (field is null) return new("missing", null, null);
@@ -77,10 +90,7 @@ public sealed partial class SqliteScanRepository : IReportExporter
             if (field.Value is null) return new("null", null, null);
             if (field.Value.Length == 0) return new("empty", "", null);
             var value = field.Value;
-            if (redact)
-                value = SafeFields.Contains(name)
-                    ? Regex.Replace(value, @"(?i)[a-z]:[\\/]+Users[\\/]+[^\\/\s""'<>]+", "<user>", RegexOptions.CultureInvariant)
-                    : "[redacted]";
+            if (redact && !IsSafe(name, value)) value = "[redacted]";
             return new("value", value, null);
         }
     }

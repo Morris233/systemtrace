@@ -146,4 +146,5 @@
   <sys:String x:Key="Exit">Exit</sys:String>
   <sys:String x:Key="PauseMonitoring">Pause monitoring</sys:String>
   <sys:String x:Key="ResumeMonitoring">Resume monitoring</sys:String>
+  <sys:String x:Key="CreateBaseline">Create baseline</sys:String>
 </ResourceDictionary>
