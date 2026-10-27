@@ -1,5 +1,7 @@
 # Dependencies / 第三方依赖
 
+PHASE 03 adds no NuGet package. Windows collectors use framework registry/network APIs and the OS CfgMgr32 DLL. GitHub CI actions were updated to official Node 24 versions: checkout v7, setup-dotnet v6 and upload-artifact v7, removing the prior deprecated-action-runtime warning. 第三阶段无新增 NuGet 依赖；采集使用系统自带 API，CI 更新为已核实的官方 Node 24 Actions。
+
 Versions below were confirmed available through NuGet's official flat-container index before use. Lock files record the complete resolved graph; packages are open source, with no paid UI package.
 
 以下版本在引入前已通过 NuGet 官方索引确认存在。完整依赖图见各项目 packages.lock.json，无商业 UI 包。

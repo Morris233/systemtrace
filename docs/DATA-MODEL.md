@@ -1,5 +1,15 @@
 # Data model / 数据模型
 
+## PHASE 03 additions / 第三阶段补充
+
+CollectionResult adds optional SkippedItemCount (default 0) and Warnings (default empty); old JSON remains readable without a schema change. Software records display name/version/publisher/system-component and exact registry source; no uninstall command or install path is captured. Startup records value name/command/source/hive/view/key, or folder scope/relative filename/last-write signal. Commands and source paths can be sensitive; they stay in the local system database and are excluded from Git/artifacts.
+
+驱动字段为 display_name、class、manufacturer、driver_provider、driver_version、driver_date。设备实例 ID 只用于本地稳定键。CM_NO_SUCH_VALUE 表示该属性确实不存在（null，无错误）；读取失败保留错误并使类别 Partial。默认仅包含 present 设备；Removed 在 UI 显示“本次未检测到”，不推断卸载。异常空设备列表视为失败。
+
+Network persists only display_name, description, interface_type and operational_status; GUID forms identity. IP/MAC/SSID/password and other identifying network data are absent from the model. Successful-empty and unsuccessful-empty remain distinct. Access errors or races preserve the last good category baseline. Startup file modification time is evidence only, never a claimed change occurrence time.
+
+真实扫描写入 is_demo=false 的独立 system-v1.db，演示仍为 is_demo=true 的 demo-v1.db。数据库来源检查禁止混用；启动仅载入已有历史，手动扫描后才创建新库。
+
 ## PHASE 02 contract / 第二阶段契约
 
 This implementation supplements the unavailable original design. 本规格为本次实现补充，非原稿恢复。

@@ -36,6 +36,19 @@ Open the built Windows application without elevation. Visit all five pages, chan
 
 初始基线、规范化、字段差异、混合采集状态、故障恢复、事务回滚、并发幂等、取消、来源隔离、迁移、重开读取及双语主题渲染均通过真实 SQLite 临时库测试；测试只清理自己的隔离目录。
 
+## PHASE 03 executed coverage / 第三阶段覆盖
+
+- Software source scopes, shared HKCU view, separate HKLM views, skipped unnamed entries and absence of uninstall/install-path fields.
+- Inert Run/RunOnce commands, folder metadata, source identities and transient warnings; commands are not expanded or executed.
+- PnP fake version changes / absence / missing values / enumeration failures; adapter fake rename/state with stable GUID and approved fields only.
+- Collector cancellation and unexpected-failure isolation; failed/partial driver/network results cannot remove old baselines.
+- Real non-elevated Windows read-only scan and baseline creation; only counts/status retained outside the temporary database.
+- Isolated current-user registry add/version-edit/remove detection and HKCU view sharing; isolated startup file/value reads; all fixtures cleaned up.
+- Both modes, separate persisted histories, localized status/warnings, not-detected wording, 40 page/language/theme render combinations and actual app startup/exit.
+- Older collection JSON defaults, schema/idempotency/diff/rollback tests from PHASE 02 remain active.
+
+Windows integration tests intentionally create only random test-owned registry keys. A constrained execution context may deny these writes; rerun the fixture suite in the normal user context rather than weakening system permissions or skipping tests. 受限环境初次拒绝测试键写入时，应使用正常用户上下文重验，并记录实际权限；不修改系统权限，不假装测试通过。
+
 ## Later-phase coverage / 后续阶段
 
 PHASE 02 requires initial baseline, add/remove/modify, canonical ordering, null values, duplicate scans, mixed category statuses, partial/failed baseline protection and transaction rollback tests. PHASE 03 adds isolated fake Windows sources and read-only integration checks. Later phases add privacy-safe export, opt-in scheduling/startup, recovery, performance and clean-machine packaging checks per PRODUCT.md. Recover or replace the missing full release test plan before PHASE 06.

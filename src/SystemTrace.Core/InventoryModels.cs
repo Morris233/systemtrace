@@ -37,13 +37,17 @@ public sealed class CollectionResult
     public DateTimeOffset CompletedAtUtc { get; }
     public IReadOnlyList<SnapshotItem> Items { get; }
     public string? ErrorCode { get; }
+    public int SkippedItemCount { get; }
+    public IReadOnlyList<string> Warnings { get; }
 
     public CollectionResult(InventoryCategory category, CollectionStatus status,
         DateTimeOffset startedAtUtc, DateTimeOffset completedAtUtc,
-        IReadOnlyList<SnapshotItem> items, string? errorCode = null)
+        IReadOnlyList<SnapshotItem> items, string? errorCode = null,
+        int skippedItemCount = 0, IReadOnlyList<string>? warnings = null)
     {
         if (!Enum.IsDefined(category) || !Enum.IsDefined(status)) throw new ArgumentOutOfRangeException(nameof(category));
         ArgumentNullException.ThrowIfNull(items);
+        if (skippedItemCount < 0) throw new ArgumentOutOfRangeException(nameof(skippedItemCount));
         if (completedAtUtc < startedAtUtc) throw new ArgumentException("Collection interval is reversed");
         var copy = items.OrderBy(item => item.StableKey, StringComparer.Ordinal).ToArray();
         if (copy.Select(item => item.StableKey).Distinct(StringComparer.Ordinal).Count() != copy.Length)
@@ -58,6 +62,8 @@ public sealed class CollectionResult
         CompletedAtUtc = completedAtUtc.ToUniversalTime();
         Items = Array.AsReadOnly(copy);
         ErrorCode = errorCode;
+        SkippedItemCount = skippedItemCount;
+        Warnings = Array.AsReadOnly((warnings ?? []).Distinct(StringComparer.Ordinal).ToArray());
     }
 }
 

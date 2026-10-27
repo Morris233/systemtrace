@@ -2,6 +2,10 @@
 
 Initialization supplement, not the missing original design. 本次初始化补充，非缺失原稿。
 
+PHASE 03: default is System mode, with a short Local / Read only / Manual scan notice and a Scan now action. A separate Demo mode remains explicitly marked, with isolated history. Four category cards show last attempt status; scope/permission warnings and skipped counts appear on hover rather than as extra paragraphs. Observation windows and field summaries use actual persisted evidence. A missing PnP device is labeled Not detected this scan. Search, full details and snapshot comparison remain PHASE 04.
+
+第三阶段默认本机模式，保留独立演示入口。主操作仅“开始扫描”，类别卡显示状态，范围与权限说明放入悬停提示。设备消失不显示“已卸载”。继续禁止口号、装饰性标题和重复解释。
+
 - Five top-level pages: Overview, Timeline, Snapshots, Troubleshoot, Settings. Change details will be a secondary surface in PHASE 04.
 - Persistent sidebar, direct functional page titles, one concise DEMO notice, quiet category cards and clear placeholder states. No slogans, decorative prose, promotional headings or repeated explanations. Style comes from spacing, typography, color and consistent controls. Keep only text that helps a user identify a function, understand its state or act.
 - Dark navy and light ivory themes, violet accent, 8-pixel spacing rhythm, 960×620 DIP minimum, scrollable content, wrapping copy. Use system fonts Segoe UI / Microsoft YaHei UI fallback.

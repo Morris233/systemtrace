@@ -8,7 +8,7 @@ SystemTrace is a Windows 11 x64 desktop project for reviewing changes to softwar
 
 ## Current milestone
 
-PHASE 02: snapshot contracts, canonical identity, field-level diffs, transactional SQLite storage and an interactive demo in the existing bilingual WPF shell. Click **Run demo** once to create a baseline, then again to generate changes. Restarting reloads the saved demo. All data remains explicitly **DEMO**. Real system collection, production comparison/search, tray monitoring, scheduling and login startup belong to later phases.
+PHASE 03: four read-only Windows collectors with stable identities, per-category results, field-level diffs and atomic SQLite history. The app opens in **System** mode: click **Scan now** to establish category baselines, then scan again to detect changes. Partial/failed categories retain their previous baseline. **Demo** switches to separate synthetic history. Full comparison/search/detail UI, tray monitoring, scheduling and login startup remain later phases.
 
 ## Build and run
 
@@ -21,7 +21,7 @@ dotnet test --no-build
 dotnet run --project src/SystemTrace.App
 ```
 
-No administrator rights are requested. Closing the window exits the application. Language and theme changes are in memory. Opening the app does not create a new database; the demo action writes synthetic history to `%LOCALAPPDATA%/SystemTrace/demo-v1.db`, separated from future real inventory. Never commit that database.
+No administrator rights are requested. Closing the window exits the application. Language/theme/mode choices are session-only. Opening the app reads existing history without scanning or creating a new database. A manual system scan writes `%LOCALAPPDATA%/SystemTrace/system-v1.db`; demo actions use `demo-v1.db`. Never commit either database. Startup commands are stored as evidence only and are never executed. Network history excludes IP/MAC/SSID/passwords.
 
 ## Repository
 
@@ -31,8 +31,8 @@ SystemTrace.slnx
 src/
   SystemTrace.App/             # WPF views, view models, composition and resources
   SystemTrace.Core/            # Platform independent contracts and diff engine
-  SystemTrace.Collectors/      # Reserved for PHASE 03 Windows collectors
-  SystemTrace.Infrastructure/  # Transactional SQLite repository and demo session
+  SystemTrace.Collectors/      # Four read-only collectors and fakeable Windows sources
+  SystemTrace.Infrastructure/  # Transactional SQLite repository and system/demo sessions
 tests/SystemTrace.Tests/       # xUnit contracts, resources and WPF shell verification
 docs/                         # Requirements, design constraints and verification records
 .github/workflows/ci.yml       # Windows build and tests
@@ -42,4 +42,4 @@ docs/                         # Requirements, design constraints and verificatio
 
 `AGENTS.md`, `docs/PRODUCT.md`, and `docs/PHASES.md` were imported from the user's downloads. The product and phase documents remain unchanged; AGENTS.md subsequently received the user's explicit concise-UI rule. The original package ZIP, README and other referenced design documents were unavailable. The README and architecture, data-model, UI and test notes were added during initialization, are explicitly scoped to PHASE 01, and do not claim to recover the missing originals. The supplied PRD and phase constraints remain authoritative.
 
-See [PHASE 02 verification](docs/PHASE-02-RESULTS.md), [PHASE 01 history](docs/PHASE-01-RESULTS.md), [third-party notices](docs/THIRD-PARTY.md), and [privacy](docs/PRIVACY.md). MIT licensed.
+See [PHASE 03 verification](docs/PHASE-03-RESULTS.md), [PHASE 02 history](docs/PHASE-02-RESULTS.md), [third-party notices](docs/THIRD-PARTY.md), and [privacy](docs/PRIVACY.md). MIT licensed.

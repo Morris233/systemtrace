@@ -48,12 +48,19 @@
       <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
       <DockPanel Margin="0,0,0,16" LastChildFill="False">
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Content="{Binding ModeToggleText}" Command="{Binding ToggleModeCommand}" Margin="0,0,10,0" AutomationProperties.Name="{Binding ModeToggleText}" />
           <Button Content="{DynamicResource LanguageToggle}" Command="{Binding ToggleLanguageCommand}" Margin="0,0,10,0" AutomationProperties.Name="{DynamicResource LanguageToggle}" />
           <Button Content="{DynamicResource ThemeToggle}" Command="{Binding ToggleThemeCommand}" AutomationProperties.Name="{DynamicResource ThemeToggle}" />
         </StackPanel>
       </DockPanel>
-      <Border Grid.Row="1" Background="{DynamicResource DemoBackgroundBrush}" BorderBrush="{DynamicResource DemoBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,24">
-        <TextBlock Text="{DynamicResource DemoNotice}" TextWrapping="Wrap" Foreground="{DynamicResource DemoTextBrush}" FontSize="13" />
+      <Border Grid.Row="1" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,24">
+        <Border.Style><Style TargetType="Border">
+          <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource LineBrush}" />
+          <Style.Triggers><DataTrigger Binding="{Binding IsDemo}" Value="True">
+            <Setter Property="Background" Value="{DynamicResource DemoBackgroundBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DemoBorderBrush}" />
+          </DataTrigger></Style.Triggers>
+        </Style></Border.Style>
+        <TextBlock Text="{Binding NoticeText}" TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}" FontSize="13" />
       </Border>
       <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
         <ContentControl Content="{Binding CurrentPage}" HorizontalContentAlignment="Stretch" />

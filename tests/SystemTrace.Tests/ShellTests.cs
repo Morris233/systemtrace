@@ -12,6 +12,7 @@ using SystemTrace.App.Services;
 using SystemTrace.App.ViewModels;
 using SystemTrace.Core;
 using SystemTrace.Infrastructure;
+using SystemTrace.Collectors;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -101,9 +102,9 @@ public sealed class ShellTests
                 var vm = new MainViewModel(new DemoSession(store.Repository), appearance, NullLogger<MainViewModel>.Instance);
                 Pump(vm.InitializeAsync());
                 Assert.Equal(0, vm.History.TotalRuns);
-                Pump(vm.RunDemoCommand.ExecuteAsync(null));
+                Pump(vm.ScanCommand.ExecuteAsync(null));
                 Assert.Empty(vm.History.Changes);
-                Pump(vm.RunDemoCommand.ExecuteAsync(null));
+                Pump(vm.ScanCommand.ExecuteAsync(null));
                 Assert.Equal(4, vm.History.Changes.Count);
                 var window = new MainWindow(vm) { Width = 960, Height = 620, ShowInTaskbar = false };
                 window.Show();
@@ -143,6 +144,55 @@ public sealed class ShellTests
                     window.UpdateLayout();
                     window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                     SavePreview(window, "overview-zh-CN-dark");
+                    using var systemStore = new TestStore(isDemo: false);
+                    var devices = new CollectorTests.FakeDevices { Batch = SourceBatch<DeviceEntry>.Complete(CollectorTests.Device("1")) };
+                    var network = new CollectorTests.FakeNetwork
+                    {
+                        Batch = SourceBatch<AdapterEntry>.Complete(new AdapterEntry(Guid.NewGuid(), "Sample adapter", "Sample", "Ethernet", "Up"))
+                    };
+                    var system = new SystemScanSession(systemStore.Repository,
+                        [new SoftwareCollector(new CollectorTests.FakeRegistry()), new StartupCollector(new CollectorTests.FakeRegistry(), new CollectorTests.FakeFiles()),
+                         new DriverCollector(devices), new NetworkCollector(network)]);
+                    var live = new MainViewModel(new DemoSession(store.Repository), appearance, NullLogger<MainViewModel>.Instance, system);
+                    window.DataContext = live;
+                    Pump(live.InitializeAsync());
+                    Assert.False(live.IsDemo);
+                    Assert.Equal(0, live.History.TotalRuns);
+                    Pump(live.ScanCommand.ExecuteAsync(null));
+                    Assert.Empty(live.History.Changes);
+                    devices.Batch = SourceBatch<DeviceEntry>.Complete(CollectorTests.Device("2"));
+                    Pump(live.ScanCommand.ExecuteAsync(null));
+                    devices.Batch = SourceBatch<DeviceEntry>.Complete();
+                    network.Batch = new SourceBatch<AdapterEntry>([], ["AccessDenied"]);
+                    Pump(live.ScanCommand.ExecuteAsync(null));
+                    Assert.Contains(((TimelinePageViewModel)live.Pages[1]).Rows, row => row.KindText == appearance.Text("NotDetected"));
+                    Assert.Equal(appearance.Text("Partial"), ((OverviewPageViewModel)live.Pages[0]).Results[3].StatusText);
+                    window.Width = 960;
+                    window.Height = 620;
+                    foreach (var language in new[] { "en-US", "zh-CN" })
+                    {
+                        if (appearance.Language != language) live.ToggleLanguageCommand.Execute(null);
+                        foreach (var dark in new[] { true, false })
+                        {
+                            if (appearance.IsDark != dark) live.ToggleThemeCommand.Execute(null);
+                            for (var page = 0; page < 5; page++)
+                            {
+                                live.SelectedPageIndex = page;
+                                window.UpdateLayout();
+                                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                                var text = Descendants(window).OfType<TextBlock>().Select(t => t.Text).ToArray();
+                                Assert.Contains(appearance.Text("LocalNotice"), text);
+                                Assert.DoesNotContain(text, value => value.Contains("DEMO", StringComparison.Ordinal));
+                                SavePreview(window, $"system-{language}-{(dark ? "dark" : "light")}-{page}");
+                            }
+                        }
+                    }
+                    Pump(live.ToggleModeCommand.ExecuteAsync(null));
+                    Assert.True(live.IsDemo);
+                    Assert.Equal(2, live.History.TotalRuns);
+                    Pump(live.ToggleModeCommand.ExecuteAsync(null));
+                    Assert.False(live.IsDemo);
+                    Assert.Equal(3, live.History.TotalRuns);
                 }
                 finally { window.Close(); }
                 listener.Flush();
@@ -245,7 +295,11 @@ public sealed class ShellTests
         Exception? failure = null;
         var thread = new Thread(() =>
         {
-            try { action(); }
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+                action();
+            }
             catch (Exception exception) { failure = exception; }
         })
         { IsBackground = true };

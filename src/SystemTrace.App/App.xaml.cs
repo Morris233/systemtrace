@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SystemTrace.App.Services;
 using SystemTrace.App.ViewModels;
 using SystemTrace.Core;
+using SystemTrace.Collectors;
 using SystemTrace.Infrastructure;
 
 namespace SystemTrace.App;
@@ -24,6 +25,17 @@ public partial class App : Application
                 System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "SystemTrace", "demo-v1.db"), isDemo: true))
             .AddSingleton<IDemoSession, DemoSession>()
+            .AddSingleton<IRegistrySource, WindowsRegistrySource>()
+            .AddSingleton<IStartupFileSource, WindowsStartupFileSource>()
+            .AddSingleton<IDeviceSource, WindowsDeviceSource>()
+            .AddSingleton<INetworkSource, WindowsNetworkSource>()
+            .AddSingleton<ISystemCollector, SoftwareCollector>()
+            .AddSingleton<ISystemCollector, StartupCollector>()
+            .AddSingleton<ISystemCollector, DriverCollector>()
+            .AddSingleton<ISystemCollector, NetworkCollector>()
+            .AddSingleton<ISystemScanSession>(provider => new SystemScanSession(
+                new SqliteScanRepository(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SystemTrace", "system-v1.db"), isDemo: false), provider.GetServices<ISystemCollector>()))
             .AddSingleton<MainViewModel>()
             .AddSingleton<MainWindow>()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
