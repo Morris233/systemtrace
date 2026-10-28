@@ -21,7 +21,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Portable locked restore failed' }
     & $Dotnet publish src/SystemTrace.App/SystemTrace.App.csproj --configuration Release --runtime win-x64 --self-contained true --no-restore --output $payload '/p:PublishTrimmed=false' '/p:PublishSingleFile=false' '/p:DebugType=None' '/p:DebugSymbols=false' "/p:SourceRevisionId=$Commit"
     if ($LASTEXITCODE -ne 0) { throw 'Portable publish failed' }
-    foreach ($document in @('README.md','README.zh-CN.md','LICENSE')) {
+    foreach ($document in @('README.md','README.zh-CN.md','CHANGELOG.md','LICENSE')) {
         Copy-Item -LiteralPath (Join-Path $repository $document) -Destination $payload
     }
     Copy-Item -LiteralPath (Join-Path $repository 'docs') -Destination (Join-Path $payload 'docs') -Recurse

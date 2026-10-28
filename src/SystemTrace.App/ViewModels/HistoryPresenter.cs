@@ -10,6 +10,7 @@ public sealed record SnapshotsPageViewModel(MainViewModel Model);
 public sealed record TroubleshootPageViewModel(MainViewModel Model);
 public sealed record SettingsPageViewModel(MainViewModel Model);
 public sealed record CategoryOption(InventoryCategory? Value, string Label);
+public sealed record KindOption(ChangeKind? Value, string Label);
 public sealed record WindowOption(int Hours, string Label);
 public sealed record CategoryRow(string Label, string ChangeCount, string ItemCount, string Status, string Hint);
 public sealed record ChangeRow(ChangePreview Preview, string Label, string Category, string Kind, string Values, string Window);
@@ -28,6 +29,8 @@ public sealed class HistoryPresenter(IAppearanceService appearance)
     public string Count(long count) => string.Format(CultureInfo.CurrentCulture, Text("ResultCountFormat"), count);
     public CategoryOption[] Categories(bool all) => (all ? new[] { new CategoryOption(null, Text("AllCategories")) } : [])
         .Concat(Enum.GetValues<InventoryCategory>().Select(c => new CategoryOption(c, Text(c.ToString())))).ToArray();
+    public KindOption[] Kinds() => new[] { new KindOption(null, Text("AllKinds")) }
+        .Concat(Enum.GetValues<ChangeKind>().Select(kind => new KindOption(kind, Text(kind.ToString())))).ToArray();
     public WindowOption[] Windows() => [new(1, Text("OneHour")), new(6, Text("SixHours")), new(24, Text("OneDay")), new(168, Text("SevenDays"))];
 
     public CategoryRow Category(CategoryOverview category)

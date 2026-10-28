@@ -40,6 +40,7 @@ public partial class MainViewModel : ObservableObject
     public string LastAttemptText => presenter.Time(dashboard.LastAttemptUtc);
     public string LastCompleteText => presenter.Time(dashboard.LastCompleteUtc);
     public string TimelinePageText => presenter.Page(timelinePage.Page, timelinePage.PageCount);
+    public string TimelineStateText => presenter.Text(timelineFilter.Text.Length > 0 || timelineFilter.Category is not null || timelineFilter.Kind is not null ? "NoMatches" : "NoChanges");
     public string TimelineCountText => presenter.Count(timelinePage.Total);
     public string TroublePageText => presenter.Page(troublePage.Page, troublePage.PageCount);
     public string TroubleCountText => presenter.Count(troublePage.Total);
@@ -60,6 +61,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private IReadOnlyList<CategoryOption> snapshotCategories = [];
     [ObservableProperty] private IReadOnlyList<WindowOption> windowOptions = [];
     [ObservableProperty] private CategoryOption? timelineCategory;
+    [ObservableProperty] private IReadOnlyList<KindOption> kindOptions = [];
+    [ObservableProperty] private KindOption? timelineKind;
     [ObservableProperty] private CategoryOption? troubleCategory;
     [ObservableProperty] private CategoryOption? snapshotCategory;
     [ObservableProperty] private WindowOption? selectedWindow;
@@ -105,7 +108,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnIsBusyChanged(bool value) => NotifyCommands();
     private void NotifyCommands()
     {
-        foreach (var command in new IRelayCommand[] { ScanCommand, SearchCommand, PreviousTimelineCommand, NextTimelineCommand,
+        foreach (var command in new IRelayCommand[] { ScanCommand, SearchCommand, ResetTimelineCommand, PreviousTimelineCommand, NextTimelineCommand,
             SearchTroubleCommand, PreviousTroubleCommand, NextTroubleCommand, LoadSnapshotsCommand, PreviousSnapshotsCommand,
             NextSnapshotsCommand, CompareCommand, PreviousComparisonCommand, NextComparisonCommand, OpenTimelineCommand,
             OpenTroubleCommand, OpenRecentCommand, ApplyPreferencesCommand, PruneHistoryCommand, ClearHistoryCommand, ExportJsonCommand, ExportCsvCommand }) command.NotifyCanExecuteChanged();
@@ -154,15 +157,24 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanWork))]
     private Task SearchAsync() => WorkAsync(async token =>
     {
-        timelineFilter = new ChangeQuery(SearchText.Trim(), TimelineCategory?.Value);
-        await LoadTimelineAsync(token);
+        await LoadTimelineAsync(token, new ChangeQuery(SearchText.Trim(), TimelineCategory?.Value, Kind: TimelineKind?.Value));
     });
 
-    private async Task LoadTimelineAsync(CancellationToken token)
+    [RelayCommand(CanExecute = nameof(CanWork))]
+    private Task ResetTimelineAsync() => WorkAsync(async token =>
     {
-        var result = await reader.QueryChangesAsync(timelineFilter, token);
+        await LoadTimelineAsync(token, new ChangeQuery());
+        SearchText = "";
+        TimelineCategory = FilterOptions[0];
+        TimelineKind = KindOptions[0];
+    });
+
+    private async Task LoadTimelineAsync(CancellationToken token, ChangeQuery? query = null)
+    {
+        var candidate = query ?? timelineFilter;
+        var result = await reader.QueryChangesAsync(candidate, token);
         timelinePage = result;
-        timelineFilter = timelineFilter with { Page = result.Page };
+        timelineFilter = candidate with { Page = result.Page };
         SelectedTimelineRow = null;
         TimelineDetail = null;
         TimelineRows = result.Items.Select(presenter.Row).ToArray();
@@ -172,9 +184,9 @@ public partial class MainViewModel : ObservableObject
     private bool CanPreviousTimeline() => CanWork() && timelinePage.Page > 0;
     private bool CanNextTimeline() => CanWork() && timelinePage.Page + 1 < timelinePage.PageCount;
     [RelayCommand(CanExecute = nameof(CanPreviousTimeline))]
-    private Task PreviousTimelineAsync() => WorkAsync(async token => { timelineFilter = timelineFilter with { Page = timelinePage.Page - 1 }; await LoadTimelineAsync(token); });
+    private Task PreviousTimelineAsync() => WorkAsync(token => LoadTimelineAsync(token, timelineFilter with { Page = timelinePage.Page - 1 }));
     [RelayCommand(CanExecute = nameof(CanNextTimeline))]
-    private Task NextTimelineAsync() => WorkAsync(async token => { timelineFilter = timelineFilter with { Page = timelinePage.Page + 1 }; await LoadTimelineAsync(token); });
+    private Task NextTimelineAsync() => WorkAsync(token => LoadTimelineAsync(token, timelineFilter with { Page = timelinePage.Page + 1 }));
 
     partial void OnSelectedTimelineRowChanged(ChangeRow? value)
     { if (!relabeling && value is not null && CanWork()) _ = OpenTimelineCommand.ExecuteAsync(value); }
@@ -196,10 +208,10 @@ public partial class MainViewModel : ObservableObject
     private Task OpenRecentAsync(ChangeRow? row) => WorkAsync(async token =>
     {
         if (row is null) return;
+        await LoadTimelineAsync(token, new ChangeQuery());
         SearchText = "";
         TimelineCategory = FilterOptions[0];
-        timelineFilter = new();
-        await LoadTimelineAsync(token);
+        TimelineKind = KindOptions[0];
         SelectedPageIndex = 1;
         SelectedTimelineRow = TimelineRows.FirstOrDefault(r => r.Preview.Id == row.Preview.Id);
         TimelineDetail = await DetailAsync(row.Preview.Id, token);
@@ -337,10 +349,13 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var timelineCategoryValue = TimelineCategory?.Value;
+            var timelineKindValue = TimelineKind?.Value;
             var troubleCategoryValue = TroubleCategory?.Value;
             var snapshotCategoryValue = SnapshotCategory?.Value ?? InventoryCategory.Software;
             var hours = SelectedWindow?.Hours ?? 24;
             FilterOptions = presenter.Categories(true);
+            KindOptions = presenter.Kinds();
+            TimelineKind = KindOptions.First(o => o.Value == timelineKindValue);
             SnapshotCategories = presenter.Categories(false);
             WindowOptions = presenter.Windows();
             TimelineCategory = FilterOptions.First(o => o.Value == timelineCategoryValue);
@@ -367,7 +382,7 @@ public partial class MainViewModel : ObservableObject
     }
     private void NotifyPageLabels()
     {
-        foreach (var name in new[] { nameof(TimelinePageText), nameof(TimelineCountText), nameof(TroublePageText), nameof(TroubleCountText),
+        foreach (var name in new[] { nameof(TimelinePageText), nameof(TimelineCountText), nameof(TimelineStateText), nameof(TroublePageText), nameof(TroubleCountText),
             nameof(SnapshotPageText), nameof(ComparisonPageText), nameof(ComparisonCountText), nameof(ComparisonStateText) }) OnPropertyChanged(name);
     }
     [RelayCommand(CanExecute = nameof(CanWork))] private async Task ToggleLanguageAsync() { appearance.ToggleLanguage(); Relabel(); await SaveAppearanceAsync(); }

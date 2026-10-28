@@ -147,4 +147,8 @@
   <sys:String x:Key="PauseMonitoring">暂停监测</sys:String>
   <sys:String x:Key="ResumeMonitoring">继续监测</sys:String>
   <sys:String x:Key="CreateBaseline">建立基线</sys:String>
+  <sys:String x:Key="AllKinds">全部类型</sys:String>
+  <sys:String x:Key="ChangeType">变化类型</sys:String>
+  <sys:String x:Key="ResetFilters">重置</sys:String>
+  <sys:String x:Key="KindHint">移除也包含本次未检测到的设备。</sys:String>
 </ResourceDictionary>

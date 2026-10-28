@@ -6,6 +6,10 @@
 
 ![字段详情，使用虚构测试数据](docs/images/changes.png)
 
+## 最新更新 — v0.1.1
+
+新增类型筛选与重置；导出覆盖同一条件下的全部记录。搜索失败时保留原列表及上次成功的导出条件。[更新记录](CHANGELOG.md) · [验收结果](docs/PHASE-07-RESULTS.md)
+
 ## 使用
 
 支持 Windows 11 x64。从 Releases 下载 win-x64 ZIP，核对 SHA256SUMS.txt 后解压，运行 **SystemTrace.App.exe**。便携包自带 .NET 10，无需安装 SDK、安装器或管理员权限。此版本未签名。
@@ -68,6 +72,6 @@ dotnet run --project src/SystemTrace.App
 
 详见[依赖](docs/THIRD-PARTY.md)、[发布流程](docs/RELEASING.md)与[贡献](CONTRIBUTING.md)。
 
-AGENTS、PRODUCT、PHASES 来自用户下载文档；PRODUCT/PHASES 保持原样，AGENTS 增补用户的简洁 UI 准则。未取得的设计原稿由明确标识的开发说明补充，不声称恢复缺失原文。各阶段记录保存在 docs/PHASE-01-RESULTS.md 至 docs/PHASE-06-RESULTS.md。
+AGENTS、PRODUCT、PHASES 来自用户下载文档；PRODUCT 保留原需求，PHASES 追加授权的维护迭代，AGENTS 增补用户的简洁 UI 准则。未取得的设计原稿由明确标识的开发说明补充，不声称恢复缺失原文。各阶段记录保存在 docs/PHASE-01-RESULTS.md 至 docs/PHASE-07-RESULTS.md。
 
 MIT 许可证；第三方组件保留各自声明。

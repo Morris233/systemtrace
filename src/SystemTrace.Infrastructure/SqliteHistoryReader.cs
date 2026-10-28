@@ -67,20 +67,31 @@ public sealed partial class SqliteScanRepository
         query.Validate();
         return ReadAsync(new PageResult<ChangePreview>([], 0, 0, query.PageSize), (connection, transaction, token) =>
         {
-            var args = new (string, object)[]
-            {
-                ("$text", NormalizeSearch(query.Text.Trim())), ("$category", query.Category is { } category ? (int)category : DBNull.Value),
-                ("$from", query.FromUtc is { } from ? Utc(from) : DBNull.Value), ("$to", query.ToUtc is { } to ? Utc(to) : DBNull.Value)
-            };
-            const string filter = " WHERE ($text='' OR instr(search_text,$text)>0) AND ($category IS NULL OR category=$category) AND ($from IS NULL OR observed_to_utc >= $from) AND ($to IS NULL OR observed_from_utc <= $to)";
-            using var count = Command(connection, transaction, "SELECT COUNT(*) FROM changes" + filter, args);
+            var args = ChangeFilterArguments(query);
+            using var count = Command(connection, transaction, "SELECT COUNT(*) FROM changes" + ChangeFilterSql, args);
             var total = (long)count.ExecuteScalar()!;
             var page = ClampPage(query.Page, query.PageSize, total);
-            using var items = Command(connection, transaction, "SELECT summary_json FROM changes" + filter + " ORDER BY observed_to_utc DESC,id DESC LIMIT $limit OFFSET $offset",
+            using var items = Command(connection, transaction, "SELECT summary_json FROM changes" + ChangeFilterSql + " ORDER BY observed_to_utc DESC,id DESC LIMIT $limit OFFSET $offset",
                 [.. args, ("$limit", query.PageSize), ("$offset", (long)page * query.PageSize)]);
             return new PageResult<ChangePreview>(ReadRows<ChangePreview>(items, token), total, page, query.PageSize);
         }, cancellationToken);
     }
+
+    // Keep paged results and streaming exports on exactly the same predicate.
+    private const string ChangeFilterSql = """
+         WHERE ($text='' OR instr(search_text,$text)>0) AND ($category IS NULL OR category=$category)
+         AND ($kind IS NULL OR kind=$kind)
+         AND ($from IS NULL OR observed_to_utc >= $from) AND ($to IS NULL OR observed_from_utc <= $to)
+        """;
+
+    private static (string, object)[] ChangeFilterArguments(ChangeQuery query) =>
+    [
+        ("$text", NormalizeSearch(query.Text.Trim())),
+        ("$category", query.Category is { } category ? (int)category : DBNull.Value),
+        ("$kind", query.Kind is { } kind ? (int)kind : DBNull.Value),
+        ("$from", query.FromUtc is { } from ? Utc(from) : DBNull.Value),
+        ("$to", query.ToUtc is { } to ? Utc(to) : DBNull.Value)
+    ];
 
     public Task<Change?> GetChangeAsync(string id, CancellationToken cancellationToken = default) =>
         ReadAsync<Change?>(null, (connection, transaction, token) =>

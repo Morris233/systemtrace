@@ -24,13 +24,9 @@ public sealed partial class SqliteScanRepository : IReportExporter
             {
                 using var connection = Open(token);
                 using var transaction = connection.BeginTransaction(deferred: true);
-                using var command = Command(connection, transaction, """
-                    SELECT evidence_json FROM changes
-                    WHERE ($text='' OR instr(search_text,$text)>0) AND ($category IS NULL OR category=$category)
-                    AND ($from IS NULL OR observed_to_utc >= $from) AND ($to IS NULL OR observed_from_utc <= $to)
-                    ORDER BY observed_to_utc DESC,id DESC
-                    """, ("$text", NormalizeSearch(query.Text.Trim())), ("$category", query.Category is { } c ? (int)c : DBNull.Value),
-                    ("$from", query.FromUtc is { } f ? Utc(f) : DBNull.Value), ("$to", query.ToUtc is { } t ? Utc(t) : DBNull.Value));
+                using var command = Command(connection, transaction,
+                    "SELECT evidence_json FROM changes" + ChangeFilterSql + " ORDER BY observed_to_utc DESC,id DESC",
+                    ChangeFilterArguments(query));
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {

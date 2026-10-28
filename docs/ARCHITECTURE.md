@@ -1,5 +1,11 @@
 # Architecture / 架构
 
+## PHASE 07 / History usability
+
+Core adds an optional validated change kind to the history query. Infrastructure shares the SQL filter and parameter construction between paged reads and streaming exports. App applies a candidate query only after a successful read, provides one reset command and preserves type selection across localization changes. Existing database schema, collection sources and defaults are unchanged.
+
+历史查询与导出共用条件；界面查询成功后才提交筛选状态，失败保持旧结果。无新依赖、无迁移。
+
 ## PHASE 06 / Release hardening
 
 The repository now supplies a replacement T001–T026 matrix explicitly scoped to observed automated evidence and separate NOT RUN environmental experiments. Windows CI builds/tests/formats and verifies a self-contained win-x64 package. Normal and runtime-specific NuGet locks remain separate. Build-Portable gathers production/runtime licenses and attribution, records commit/SDK/runtime, validates payload and extracted-ZIP process/runtime isolation, then atomically writes ZIP/checksums. Release publishing is a gated main-only workflow with no silent version overwrite.

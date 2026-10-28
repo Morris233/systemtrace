@@ -7,7 +7,7 @@
 5. The workflow rebuilds/tests/formats, packages/licenses/smoke-tests on Windows, uploads immutable artifacts, verifies SHA256 again, and creates the version tag plus GitHub Release once. Publishing is restricted to main; the publish job alone has contents-write permission. An existing version fails rather than silently replacing assets.
 6. Verify the final commit, Actions success, tag target, Release assets/checksums and public repository visibility through GitHub. Record exact links. If access/visibility is blocked, report that step as pending.
 
-The user explicitly authorized this v0.1.0 public publication. Future releases still require an intentional workflow dispatch or [release] marker from an authorized maintainer. Repository visibility is a separate GitHub settings action, not something the release token can change.
+The user explicitly authorized public publication, followed by continued project improvements and GitHub updates for v0.1.1. Future releases still require an intentional workflow dispatch or [release] marker from an authorized maintainer. Repository visibility is a separate GitHub settings action, not something the release token can change.
 
 The package is a multi-file self-contained win-x64 ZIP. Extract the complete folder; do not copy the executable alone. It includes .NET runtime/native SQLite and corresponding licenses/notices. Deterministic managed compilation and locked package versions make the procedure reproducible; ZIP timestamps/SDK patch changes mean byte-identical builds across machines are not promised. BUILD-INFO.json records the actual commit/SDK/runtime.
 

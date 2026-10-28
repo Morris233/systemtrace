@@ -6,6 +6,10 @@ Local Windows history for software, monitored startup sources, present PnP drive
 
 ![Change details with synthetic test data](docs/images/changes.png)
 
+## Latest update — v0.1.1
+
+Filter changes by type, reset with one action, and export the same matching records across all pages. Failed searches preserve the last successful results and export conditions. [Changelog](CHANGELOG.md) · [Verification](docs/PHASE-07-RESULTS.md)
+
 ## Run
 
 Windows 11 x64. Download the win-x64 ZIP from Releases, compare its SHA256 with SHA256SUMS.txt, extract it and open **SystemTrace.App.exe**. The portable package includes .NET 10; it needs no SDK, installer or administrator account. The build is unsigned.
@@ -72,6 +76,6 @@ Normal and win-x64 publish lock files are separate. Source/payload excludes inve
 
 App (WPF/MVVM), Core (platform-independent contracts/diff/query/schedule), Collectors (read-only Windows adapters), Infrastructure (SQLite/settings/exports), tests, docs and scripts.
 
-AGENTS.md, PRODUCT.md and PHASES.md were supplied from the user's downloads. PRODUCT/PHASES remain unchanged; AGENTS carries the user's concise-UI rule. Missing design originals were replaced by clearly identified development notes, not claimed as recovered. Six implementation milestones are recorded in docs/PHASE-01-RESULTS.md through docs/PHASE-06-RESULTS.md.
+AGENTS.md, PRODUCT.md and PHASES.md were supplied from the user's downloads. PRODUCT retains the original requirements; PHASES records the authorized maintenance iteration; AGENTS carries the user's concise-UI rule. Missing design originals were replaced by clearly identified development notes, not claimed as recovered. Six implementation milestones are recorded in docs/PHASE-01-RESULTS.md through docs/PHASE-06-RESULTS.md.
 
 MIT. Third-party components retain their respective notices.

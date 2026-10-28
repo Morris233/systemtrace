@@ -4,6 +4,12 @@ The user's rule is authoritative: few words, direct functional labels, clear rea
 
 用户准则：简洁少字、易扫读、操作有逻辑。页面用功能名；不用口号、主题类文案、营销句或重复说明。仅保留功能标签、状态、操作提示。排版、留白、配色与一致控件体现风格。
 
+## PHASE 07
+
+The Changes toolbar adds a compact type picker and Reset. Search/Enter applies text, category and type together. Reset restores all types/categories, empty text and page one, clearing selected detail. Changing language retains the type. Filtered empty results say “No matching records”; unfiltered empty results say “No changes”. Device absence remains “Not detected this scan” in rows/details, with a brief type-picker tooltip explaining its inclusion under Removed.
+
+时间线仅增加类型下拉框和“重置”；不增加装饰文案。筛选失败保留原列表与已应用导出条件。类型、类别、关键词需搜索或回车后生效。
+
 ## PHASE 04
 
 - Five persistent pages: Overview / Changes / Snapshots / Troubleshoot / Settings. The global header has a short factual local/read-only/manual notice and language, theme and scan actions. No Demo entry or synthetic production data.
