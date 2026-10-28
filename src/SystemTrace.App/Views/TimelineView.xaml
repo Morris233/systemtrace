@@ -18,6 +18,8 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition/>
         <ColumnDefinition Width="140"/>
+        <ColumnDefinition Width="120"/>
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       <TextBox x:Name="SearchBox" Text="{Binding SearchText,UpdateSourceTrigger=PropertyChanged}" Tag="{DynamicResource SearchHint}" MaxLength="512" AutomationProperties.Name="{DynamicResource Search}">
@@ -26,7 +28,9 @@
         </TextBox.InputBindings>
       </TextBox>
       <ComboBox Grid.Column="1" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding TimelineCategory}" Margin="8,0" AutomationProperties.Name="{DynamicResource Category}"/>
-      <Button Grid.Column="2" Content="{DynamicResource Search}" Command="{Binding SearchCommand}"/>
+      <ComboBox Grid.Column="2" ItemsSource="{Binding KindOptions}" DisplayMemberPath="Label" SelectedItem="{Binding TimelineKind}" Margin="0,0,8,0" AutomationProperties.Name="{DynamicResource ChangeType}" ToolTip="{DynamicResource KindHint}"/>
+      <Button Grid.Column="3" Content="{DynamicResource Search}" Command="{Binding SearchCommand}"/>
+      <Button Grid.Column="4" Content="{DynamicResource ResetFilters}" Command="{Binding ResetTimelineCommand}" Margin="8,0,0,0"/>
     </Grid>
     <Grid Grid.Row="2" Margin="0,12,0,12">
       <Grid.ColumnDefinitions>
@@ -45,6 +49,6 @@
       </StackPanel>
       <TextBlock Text="{Binding TimelineCountText}" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
     </DockPanel>
-    <TextBlock Grid.Row="2" Text="{DynamicResource NoChanges}" Style="{StaticResource EmptyTimeline}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,28,0,0"/>
+    <TextBlock Grid.Row="2" Text="{Binding TimelineStateText}" Style="{StaticResource EmptyTimeline}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,28,0,0"/>
   </Grid>
 </UserControl>

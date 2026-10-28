@@ -1,13 +1,14 @@
 namespace SystemTrace.Core;
 
 public sealed record ChangeQuery(string Text = "", InventoryCategory? Category = null,
-    DateTimeOffset? FromUtc = null, DateTimeOffset? ToUtc = null, int Page = 0, int PageSize = 40)
+    DateTimeOffset? FromUtc = null, DateTimeOffset? ToUtc = null, int Page = 0, int PageSize = 40, ChangeKind? Kind = null)
 {
     public void Validate()
     {
         if (Page < 0 || PageSize is < 1 or > 100 || Text.Length > 512)
             throw new ArgumentOutOfRangeException(nameof(Page));
         if (Category is { } category && !Enum.IsDefined(category)) throw new ArgumentOutOfRangeException(nameof(Category));
+        if (Kind is { } kind && !Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(Kind));
         if (FromUtc > ToUtc) throw new ArgumentException("Reversed observation range");
     }
 }

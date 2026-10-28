@@ -147,4 +147,8 @@
   <sys:String x:Key="PauseMonitoring">Pause monitoring</sys:String>
   <sys:String x:Key="ResumeMonitoring">Resume monitoring</sys:String>
   <sys:String x:Key="CreateBaseline">Create baseline</sys:String>
+  <sys:String x:Key="AllKinds">All types</sys:String>
+  <sys:String x:Key="ChangeType">Change type</sys:String>
+  <sys:String x:Key="ResetFilters">Reset</sys:String>
+  <sys:String x:Key="KindHint">Removed also includes devices not detected in this scan.</sys:String>
 </ResourceDictionary>

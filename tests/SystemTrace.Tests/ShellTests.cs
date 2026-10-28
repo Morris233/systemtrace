@@ -97,6 +97,7 @@ public sealed class ShellTests
                 Assert.Null(vm.TimelineDetail);
                 vm.SearchText = "%_';--";
                 vm.TimelineCategory = vm.FilterOptions.Single(o => o.Value == InventoryCategory.Software);
+                vm.TimelineKind = vm.KindOptions.Single(o => o.Value == ChangeKind.Modified);
                 Pump(vm.SearchCommand.ExecuteAsync(null));
                 var row = Assert.Single(vm.TimelineRows);
                 vm.SelectedTimelineRow = row;
@@ -133,6 +134,7 @@ public sealed class ShellTests
                         if (appearance.Language != language) vm.ToggleLanguageCommand.Execute(null);
                         Assert.Equal("%_';--", vm.SearchText);
                         Assert.Equal(InventoryCategory.Software, vm.TimelineCategory!.Value);
+                        Assert.Equal(ChangeKind.Modified, vm.TimelineKind!.Value);
                         Assert.Equal(detailId, vm.TimelineDetail!.Evidence.Id);
                         Assert.Equal(pair, (vm.BeforeSnapshot!.Header.Id, vm.AfterSnapshot!.Header.Id));
                         Assert.NotNull(vm.ComparisonDetail);
@@ -145,7 +147,7 @@ public sealed class ShellTests
                                 Layout(window);
                                 var rendered = Descendants(window).OfType<TextBlock>().Select(t => t.Text).ToArray();
                                 Assert.DoesNotContain(rendered, text => text.Contains("DEMO", StringComparison.OrdinalIgnoreCase));
-                                Assert.DoesNotContain(rendered, text => text.Contains("CategoryOption {") || text.Contains("WindowOption {") || text.Contains("SnapshotOption {"));
+                                Assert.DoesNotContain(rendered, text => text.Contains("CategoryOption {") || text.Contains("KindOption {") || text.Contains("WindowOption {") || text.Contains("SnapshotOption {"));
                                 var title = new[] { "OverviewTitle", "TimelineTitle", "SnapshotsTitle", "TroubleshootTitle", "SettingsTitle" }[page];
                                 Assert.Contains(appearance.Text(title), rendered);
                                 Assert.True(Descendants(window).OfType<UserControl>().All(v => v.ActualWidth > 0));
@@ -215,6 +217,7 @@ public sealed class ShellTests
                     publicModel.SelectedPageIndex = 0; Layout(window); SavePreview(window, "public-overview");
                     publicModel.SelectedPageIndex = 1;
                     publicModel.TimelineCategory = publicModel.FilterOptions.Single(option => option.Value == InventoryCategory.Software);
+                    publicModel.TimelineKind = publicModel.KindOptions.Single(option => option.Value == ChangeKind.Modified);
                     Pump(publicModel.SearchCommand.ExecuteAsync(null));
                     publicModel.SelectedTimelineRow = publicModel.TimelineRows[0];
                     Pump(publicModel.OpenTimelineCommand.ExecutionTask!);

@@ -50,6 +50,10 @@ Do not alter system display settings, actual startup entries or real installed s
 
 ## Reproduce / 复现
 
+PHASE 07 adds `TimelineFilterTests`: Added/Removed/Modified intersections and paging; JSON/CSV full-match exports; invalid enum rejection without output/store creation; reset and recent-record navigation; failed-search export consistency. The existing WPF matrix additionally checks selected type survives language changes and renders the new picker in both themes at minimum size. See [PHASE-07-RESULTS.md](PHASE-07-RESULTS.md).
+
+第七阶段补充类型筛选、导出一致性、重置、失败恢复与切换语言测试；不改变上述实机实验边界。
+
 ```powershell
 dotnet restore --locked-mode
 dotnet build --configuration Release --no-restore

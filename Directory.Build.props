@@ -7,7 +7,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <NuGetLockFilePath Condition="'$(RuntimeIdentifier)' == 'win-x64' Or '$(RuntimeIdentifiers)' == 'win-x64'">$(MSBuildProjectDirectory)/packages.win-x64.lock.json</NuGetLockFilePath>
     <Deterministic>true</Deterministic>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>SystemTrace contributors</Authors>
     <RepositoryUrl>https://github.com/Morris233/systemtrace</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

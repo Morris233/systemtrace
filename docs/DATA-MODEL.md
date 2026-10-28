@@ -1,5 +1,11 @@
 # Data model / 数据模型
 
+## PHASE 07 query extension / 第七阶段查询扩展
+
+`ChangeQuery.Kind` is an optional validated `ChangeKind` appended to the existing arguments. Null selects all kinds. It intersects text, category and observation-window bounds. Both paged reads and streaming exports share one parameterized SQL predicate against the existing `changes.kind` column; schema remains 2. Export still ignores page/page size and includes all matches. Only successful reads replace the applied timeline filter.
+
+可选类型筛选与其余条件取交集；不新增数据库字段或采集信息。失败查询保留上次已应用条件，防止列表与导出不一致。
+
 ## PHASE 04 queries and schema 2 / 第四阶段查询与迁移
 
 - ChangeQuery accepts literal text (up to 512 characters), an optional category and optional inclusive UTC observation-window bounds. Pages are zero based, default 40, allowed size 1–100. Out-of-range positive pages clamp to the last page. Results sort by observed_to_utc DESC, id DESC within one consistent transaction.
